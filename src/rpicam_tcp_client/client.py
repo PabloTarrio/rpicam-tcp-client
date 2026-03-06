@@ -4,8 +4,9 @@ Cliente TCP para conectarse al servidor de la Raspberry Pi Camera y recibir fram
 
 import socket
 import struct
-import numpy as np
+
 import cv2
+import numpy as np
 
 class CameraClient:
     """
@@ -70,7 +71,7 @@ class CameraClient:
             raise Exception ("No hay conexión con el servidor")
         
         try:
-            #1. Recibir los 4 bytes que indican el tamaño del frame (empaquetado como 'Long')
+            #1. Recibir los 4 bytes del tamaño del frame (empaquetado como 'Long')
             payload_size = struct.calcsize("L")
             data = b""
 
@@ -93,7 +94,7 @@ class CameraClient:
                     return None
                 frame_data += packet
             
-            #3. Decodificar los bytes recibidos a una matriz (array) de imagen usando numpy y OpenCV
+            #3. Decodificar los bytes a una matriz de imagen usando numpy y OpenCV
             nparr = np.frombuffer(frame_data, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
