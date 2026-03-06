@@ -1,0 +1,23 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Python cache y builds
+__pycache__/
+*.pyc
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# IDEs
+.vscode/
+.idea/
+
+# Archivos multimedia generados por los tests/ejemplos
+*.jpg
+*.jpeg
+*.png
+*.h264
+*.mp4
