@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rpicam-tcp-client"
+version = "0.1.0"
+description = "Python TCP client library for Raspberry Pi Camera Module 2 NoIR"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "opencv-python"
+]
+license = {text = "MIT"}
+authors = [
+    {name = "Pablo M. Tarrío", email = "pablo.tarrio@uie.edu"}
+]
+keywords = ["raspberry-pi", "camera", "noir", "tcp", "robotics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3"
+]
+
+[project.urls]
+Homepage = "https://github.com/PabloTarrio/rpicam-tcp-client"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0.0", "ruff>=0.1.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
