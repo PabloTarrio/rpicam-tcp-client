@@ -1,5 +1,5 @@
 """
-Librería cliente para recibir video de Raspberry Pi Camera via TCP
+Librería cliente para recibir video de Raspberry Pi Camera vía TCP.
 """
 
 from .client import CameraClient

@@ -20,6 +20,7 @@ pueda importarse sin errores.
 
 # MagicMock nos permite crear un objeto "falso" que imita cualquier módulo.
 # Lo usamos para engañar a picamera2 y que no falle al buscar 'pykms'.
+import json
 import sys
 from unittest.mock import MagicMock
 
@@ -33,36 +34,103 @@ from picamera2 import Picamera2  # noqa: E402
 
 # --- Configuración ---
 TCP_HOST = "0.0.0.0"  # Escucha en todas las interfaces de red de la RPi
-TCP_PORT = 5001  # Puerto 5001 para no colisionar con el LIDAR (puerto 5000)
-FRAME_WIDTH = 640  # Ancho del frame en píxeles
-FRAME_HEIGHT = 480  # Alto del frame en píxeles
-JPEG_QUALITY = 80  # Calidad JPEG (0-100). Mayor = más calidad pero más peso
+TCP_PORT = 5001       # Puerto 5001 para no colisionar con el LIDAR (puerto 5000)
+FRAME_WIDTH = 1920    # Ancho del frame en píxeles
+FRAME_HEIGHT = 1080   # Alto del frame en píxeles
+JPEG_QUALITY = 80     # Calidad JPEG (0-100). Mayor = más calidad pero más peso
 
-
-def configurar_camara():
+def recibir_parametros(cliente) -> dict:
     """
-    Crea y configura la cámara con la resolución deseada.
+    Lee el JSON de configuración que envía el cliente al conectarse.
 
-    Usamos el modo 'still' (foto) en lugar de 'video' porque nos da
-    imágenes de mayor calidad. La resolución se ajusta a FRAME_WIDTH x
-    FRAME_HEIGHT definidos arriba.
+    El cliente envía primero 4 bytes con el tamaño del JSON, y después
+    los bytes del JSON en sí. Este es el mismo protocolo que usamos
+    para enviar frames, pero en dirección contraria.
+
+    Si ocurre cualquier error al leer, devuelve un diccionario vacío
+    y el servidor usará sus valores por defecto para todo.
+
+    Args:
+        cliente: El socket del cliente recién conectado.
+
+    Returns:
+        dict: Los parámetros enviados por el cliente, o {} si hubo error.
+    """
+    try:
+        # 1. Leer los 4 bytes que indican el tamaño del JSON
+        payload_size = struct.calcsize("L")
+        data = b""
+        while len(data) < payload_size:
+            packet = cliente.recv(payload_size - len(data))
+            if not packet:
+                return {}
+            data += packet
+
+        # 2. Extraer el tamaño y leer exactamente esos bytes
+        msg_size = struct.unpack("L", data)[0]
+        json_data = b""
+        while len(json_data) < msg_size:
+            packet = cliente.recv(min(msg_size - len(json_data), 4096))
+            if not packet:
+                return {}
+            json_data += packet
+
+        # 3. Decodificar el JSON a un diccionario Python
+        params = json.loads(json_data.decode("utf-8"))
+        print(f"  Parámetros recibidos del cliente: {params}")
+        return params
+
+    except Exception as e:
+        print(f"  Error al leer parámetros del cliente: {e}. Usando valores por defecto.")
+        return {}
+
+def configurar_camara(params: dict):
+    """
+    Crea y configura la cámara aplicando los parámetros recibidos del cliente.
+
+    Los valores del cliente sobreescriben los valores por defecto definidos
+    en las constantes de configuración. Si el cliente no especificó algún
+    parámetro, se usa el valor por defecto del servidor.
+
+    Args:
+        params (dict): Parámetros enviados por el cliente. Puede estar vacío.
 
     Returns:
         Picamera2: El objeto de la cámara ya configurado y arrancado.
     """
+    # Fusionamos los valores por defecto con los del cliente.
+    # Los del cliente tienen prioridad si están presentes.
+    width = params.get("width", FRAME_WIDTH)
+    height = params.get("height", FRAME_HEIGHT)
+    jpeg_quality = params.get("jpeg_quality", JPEG_QUALITY)
+
     cam = Picamera2()
 
-    # Creamos una configuración de tipo 'still' (captura de imagen)
-    # con el tamaño que hemos definido en la configuración
-    config = cam.create_still_configuration(main={"size": (FRAME_WIDTH, FRAME_HEIGHT)})
+    config = cam.create_still_configuration(main={"size": (width, height)})
     cam.configure(config)
 
-    # Arrancamos la cámara: a partir de aquí ya está capturando
+    # Aplicamos los controles de imagen si el cliente los especificó
+    controles = {}
+    if "brightness" in params:
+        controles["Brightness"] = params["brightness"]
+    if "contrast" in params:
+        controles["Contrast"] = params["contrast"]
+    if "saturation" in params:
+        controles["Saturation"] = params["saturation"]
+    if "sharpness" in params:
+        controles["Sharpness"] = params["sharpness"]
+    if "exposure_time" in params:
+        controles["ExposureTime"] = params["exposure_time"]
+    if "analogue_gain" in params:
+        controles["AnalogueGain"] = params["analogue_gain"]
+
+    if controles:
+        cam.set_controls(controles)
+
     cam.start()
-    return cam
+    return cam, width, height, jpeg_quality
 
-
-def enviar_frame(cliente, frame):
+def enviar_frame(cliente, frame, jpeg_quality: int):
     """
     Comprime un frame a JPEG y lo envía al cliente por TCP.
 
@@ -81,7 +149,7 @@ def enviar_frame(cliente, frame):
     # Comprimimos el frame a formato JPEG para reducir su tamaño
     # encode devuelve (éxito, array_de_bytes)
     resultado, buffer = cv2.imencode(
-        ".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY]
+        ".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, jpeg_quality]
     )
 
     if not resultado:
@@ -105,7 +173,6 @@ def enviar_frame(cliente, frame):
         # El cliente se ha desconectado durante el envío
         return False
 
-
 def main():
     """
     Función principal del servidor.
@@ -118,11 +185,6 @@ def main():
     print("=" * 60)
     print("SERVIDOR CÁMARA TCP")
     print("=" * 60)
-
-    # --- Paso 1: Arrancar la cámara ---
-    print("[1] Iniciando la cámara...")
-    cam = configurar_camara()
-    print(f"    Cámara lista: {FRAME_WIDTH}x{FRAME_HEIGHT} px")
 
     # --- Paso 2: Crear el socket TCP del servidor ---
     print("[2] Iniciando servidor TCP...")
@@ -140,7 +202,12 @@ def main():
             # --- Paso 3: Esperar a que un cliente se conecte ---
             print("[3] Esperando cliente...")
             cliente, direccion = servidor.accept()
-            print(f"    Cliente conectado desde {direccion}")
+            print(f"  Cliente conectado desde {direccion}")
+
+            # Leer parámetros y configurar la cámara
+            params = recibir_parametros(cliente)
+            cam, width, height, jpeg_quality = configurar_camara(params)
+            print(f"  Cámara lista: {width}x{height} px, JPEG quality: {jpeg_quality}")
 
             frame_count = 0
             try:
@@ -150,7 +217,7 @@ def main():
                     frame = cam.capture_array()
 
                     # Intentamos enviarlo al cliente
-                    if not enviar_frame(cliente, frame):
+                    if not enviar_frame(cliente, frame, jpeg_quality):
                         # Si falla el envío, el cliente se ha desconectado
                         break
 
@@ -163,6 +230,8 @@ def main():
                 # Cerramos la conexión con este cliente antes de
                 # volver a esperar al siguiente
                 cliente.close()
+                cam.stop()
+                cam.close()
                 print(f"\n    Cliente desconectado tras {frame_count} frames")
 
     except KeyboardInterrupt:
@@ -171,12 +240,9 @@ def main():
     finally:
         # Siempre cerramos la cámara y el socket, pase lo que pase
         servidor.close()
-        cam.stop()
-        cam.close()
         print("=" * 60)
         print("Servidor cerrado correctamente")
         print("=" * 60)
-
 
 # Este bloque garantiza que main() solo se ejecuta cuando lanzamos
 # el script directamente (no cuando se importa como módulo)

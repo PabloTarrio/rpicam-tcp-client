@@ -1,43 +1,111 @@
 """
 Cliente TCP para conectarse al servidor de la Raspberry Pi Camera y recibir frames.
 """
-
+import json
 import socket
 import struct
 
 import cv2
 import numpy as np
-
-
 class CameraClient:
     """
     Cliente para recibir frames de video desde la Raspberry Pi a través de TCP.
     """
 
-    def __init__(self, host: str, port: int = 5001):
+    def __init__(                         
+        self,
+        host: str,
+        port: int = 5001,
+        *,
+        width: int | None = None,
+        height: int | None = None,
+        jpeg_quality: int | None = None,
+        brightness: float | None = None,
+        contrast: float | None = None,
+        saturation: float | None = None,
+        sharpness: float | None = None,
+        exposure_time: int | None = None,
+        analogue_gain: float | None = None,
+    ):
         """
         Inicializa el cliente.
 
         Args:
             host (str): Dirección IP de la Raspberry Pi.
             port (int): Puerto del servidor (por defecto 5001).
+            width (int | None): Ancho del frame en píxeles. Si es None, usa
+                el valor por defecto del servidor.
+            height (int | None): Alto del frame en píxeles. Si es None, usa
+                el valor por defecto del servidor.
+            jpeg_quality (int | None): Calidad JPEG (0-100). Si es None, usa
+                el valor por defecto del servidor.
+            brightness (float | None): Brillo de la imagen. Si es None, usa
+                el valor por defecto del servidor.
+            contrast (float | None): Contraste de la imagen. Si es None, usa
+                el valor por defecto del servidor.
+            saturation (float | None): Saturación de la imagen. Si es None,
+                usa el valor por defecto del servidor.
+            sharpness (float | None): Nitidez de la imagen. Si es None, usa
+                el valor por defecto del servidor.
+            exposure_time (int | None): Tiempo de exposición en microsegundos.
+                Si es None, usa el valor por defecto del servidor.
+            analogue_gain (float | None): Ganancia analógica del sensor.
+                Si es None, usa el valor por defecto del servidor.
         """
         self.host = host
         self.port = port
         self.socket = None
         self.connected = False
 
+        self._params: dict = {}
+        if width is not None:
+            self._params["width"] = width
+        if height is not None:
+            self._params["height"] = height
+        if jpeg_quality is not None:
+            self._params["jpeg_quality"] = jpeg_quality
+        if brightness is not None:
+            self._params["brightness"] = brightness
+        if contrast is not None:
+            self._params["contrast"] = contrast
+        if saturation is not None:
+            self._params["saturation"] = saturation
+        if sharpness is not None:
+            self._params["sharpness"] = sharpness
+        if exposure_time is not None:
+            self._params["exposure_time"] = exposure_time
+        if analogue_gain is not None:
+            self._params["analogue_gain"] = analogue_gain
+
     def connect(self):
         """
-        Conecta al servidor TCP de la cámara
+        Conecta al servidor TCP de la cámara y envía los parámetros
+        de configuración como JSON.
+
+        El servidor leerá este JSON antes de empezar a enviar frames,
+        y aplicará los parámetros recibidos sobre sus valores por defecto.
+        Si no se especificó ningún parámetro, se envía un JSON vacío {}
+        y el servidor usará toda su configuración por defecto.
         """
         if self.connected:
             raise Exception("Ya estás conectado al servidor")
-
+        
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
         self.connected = True
         print(f"Conectado a la cámara en {self.host}:{self.port}")
+
+        # Serializamos los parámetros a JSON y los enviamos al servidor.
+        # Si _params está vacío, enviamos {} y el servidor usará sus
+        # valores por defecto para todo
+        params_json = json.dumps(self._params).encode("utf-8")
+
+        # Primero enviamos el tamaño del JSON en 4 bytes, igual que
+        # hacemos con los frames. Así el servidor sabe cuantos bytes leer.
+        self.socket.sendall(struct.pack("L", len(params_json)))
+        self.socket.sendall(params_json)
+        params_info = self._params if self._params else "ninguno (valores por defecto)"
+        print(f"   Parámetros enviados: {params_info}")
 
     def disconnect(self):
         """
