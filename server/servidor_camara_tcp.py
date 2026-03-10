@@ -34,10 +34,11 @@ from picamera2 import Picamera2  # noqa: E402
 
 # --- Configuración ---
 TCP_HOST = "0.0.0.0"  # Escucha en todas las interfaces de red de la RPi
-TCP_PORT = 5001       # Puerto 5001 para no colisionar con el LIDAR (puerto 5000)
-FRAME_WIDTH = 1920    # Ancho del frame en píxeles
-FRAME_HEIGHT = 1080   # Alto del frame en píxeles
-JPEG_QUALITY = 80     # Calidad JPEG (0-100). Mayor = más calidad pero más peso
+TCP_PORT = 5001  # Puerto 5001 para no colisionar con el LIDAR (puerto 5000)
+FRAME_WIDTH = 1920  # Ancho del frame en píxeles
+FRAME_HEIGHT = 1080  # Alto del frame en píxeles
+JPEG_QUALITY = 80  # Calidad JPEG (0-100). Mayor = más calidad pero más peso
+
 
 def recibir_parametros(cliente) -> dict:
     """
@@ -85,6 +86,7 @@ def recibir_parametros(cliente) -> dict:
         print(msg)
         return {}
 
+
 def configurar_camara(params: dict):
     """
     Crea y configura la cámara aplicando los parámetros recibidos del cliente.
@@ -131,6 +133,7 @@ def configurar_camara(params: dict):
     cam.start()
     return cam, width, height, jpeg_quality
 
+
 def enviar_frame(cliente, frame, jpeg_quality: int):
     """
     Comprime un frame a JPEG y lo envía al cliente por TCP.
@@ -173,6 +176,7 @@ def enviar_frame(cliente, frame, jpeg_quality: int):
     except (BrokenPipeError, ConnectionResetError):
         # El cliente se ha desconectado durante el envío
         return False
+
 
 def main():
     """
@@ -244,6 +248,7 @@ def main():
         print("=" * 60)
         print("Servidor cerrado correctamente")
         print("=" * 60)
+
 
 # Este bloque garantiza que main() solo se ejecuta cuando lanzamos
 # el script directamente (no cuando se importa como módulo)

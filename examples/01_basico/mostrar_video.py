@@ -27,7 +27,7 @@ def main():
     parser.add_argument("--host", required=True, help="IP de la Raspberry Pi")
     parser.add_argument(
         "--port", type=int, default=5001, help="Puerto TCP (por defecto 5001)"
-        )
+    )
     args = parser.parse_args()
 
     msg = f"Conectando a {args.host}:{args.port}. Valores por defecto del servidor."
