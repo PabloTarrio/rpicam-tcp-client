@@ -81,7 +81,8 @@ def recibir_parametros(cliente) -> dict:
         return params
 
     except Exception as e:
-        print(f"  Error al leer parámetros del cliente: {e}. Usando valores por defecto.")
+        msg = f"  Error al leer parámetros del cliente: {e}. Usando valores por defecto."
+        print(msg)
         return {}
 
 def configurar_camara(params: dict):

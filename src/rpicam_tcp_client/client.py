@@ -7,6 +7,8 @@ import struct
 
 import cv2
 import numpy as np
+
+
 class CameraClient:
     """
     Cliente para recibir frames de video desde la Raspberry Pi a través de TCP.

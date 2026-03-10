@@ -25,10 +25,13 @@ from rpicam_tcp_client import CameraClient
 def main():
     parser = argparse.ArgumentParser(description="Muestra vídeo desde la Raspberry Pi.")
     parser.add_argument("--host", required=True, help="IP de la Raspberry Pi")
-    parser.add_argument("--port", type=int, default=5001, help="Puerto TCP (por defecto 5001)")
+    parser.add_argument(
+        "--port", type=int, default=5001, help="Puerto TCP (por defecto 5001)"
+        )
     args = parser.parse_args()
 
-    print(f"Conectando a {args.host}:{args.port} con valores por defecto del servidor...")
+    msg = f"Conectando a {args.host}:{args.port} con valores por defecto del servidor..."
+    print(msg)
 
     with CameraClient(host=args.host, port=args.port) as cam:
         print("Recibiendo vídeo. Pulsa Q para salir.")
