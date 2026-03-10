@@ -1,63 +1,52 @@
 """
-Ejemplo básico: recibir y mostrar video desde la Raspberry Pi Camera.
+Ejemplo básico: mostrar vídeo en tiempo real desde la Raspberry Pi.
 
-Este script se conecta al servidor TCP que corre en la Raspberry Pi,
-recibe frames continuamente y los muestra en una ventana en la pantalla.
+Demuestra el uso más sencillo de CameraClient: conectarse al servidor,
+recibir frames continuamente y mostrarlos en pantalla con OpenCV.
+
+En este ejemplo se usan los valores por defecto del servidor para todos
+los parámetros de la cámara (resolución, calidad JPEG, etc.).
 
 Uso:
-
-    python3 mostrar_video.py
+    python mostrar_video.py --host <IP_RASPBERRY>
+    python mostrar_video.py --host <IP_RASPBERRY> --port 5001
 
 Controles:
-
-    - Usa 'q' para salir
-
-Requisitos:
-
-    - El servidor servidor_camara_tcp.py debe estar corriendo en la RPi.
-    - Ajusta HOST con la IP de tu Raspberry Pi.
+    Q  →  salir
 """
+
+import argparse
+
+import cv2
 
 from rpicam_tcp_client import CameraClient
 
-# --- Configuración ---
-HOST = "172.16.125.90"
-PORT = 5001
-
 
 def main():
-    print("Conectado al servidor de la cámara...")
-    print(f"   Host: {HOST}:{PORT}")
-    print("Pulsa 'q' para salir\n")
+    parser = argparse.ArgumentParser(description="Muestra vídeo desde la Raspberry Pi.")
+    parser.add_argument("--host", required=True, help="IP de la Raspberry Pi")
+    parser.add_argument(
+        "--port", type=int, default=5001, help="Puerto TCP (por defecto 5001)"
+    )
+    args = parser.parse_args()
 
-    with CameraClient(HOST, PORT) as cam:
-        frame_count = 0
+    msg = f"Conectando a {args.host}:{args.port}. Valores por defecto del servidor."
+    print(msg)
 
+    with CameraClient(host=args.host, port=args.port) as cam:
+        print("Recibiendo vídeo. Pulsa Q para salir.")
         while True:
-            # Recibimos un frame del servidor
             frame = cam.get_frame()
-
             if frame is None:
-                print("No se pudo recibir el frame. Saliendo....")
+                print("Conexión perdida.")
                 break
-
-            frame_count += 1
-            print(f"Frame {frame_count} recibido", end="\r")
-
-            # Mostramos el frame en una ventana
-            import cv2
 
             cv2.imshow("Raspberry Pi Camera", frame)
 
             if cv2.waitKey(1) & 0xFF == ord("q"):
-                print("\nSaliendo...")
                 break
 
-    # Cerramos todas las ventanas de OpenCV
-    import cv2
-
     cv2.destroyAllWindows()
-    print(f"Total de frames recibidos: {frame_count}")
 
 
 if __name__ == "__main__":
