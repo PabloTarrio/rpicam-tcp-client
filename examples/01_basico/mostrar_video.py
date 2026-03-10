@@ -30,7 +30,7 @@ def main():
         )
     args = parser.parse_args()
 
-    msg = f"Conectando a {args.host}:{args.port} con valores por defecto del servidor..."
+    msg = f"Conectando a {args.host}:{args.port}. Valores por defecto del servidor."
     print(msg)
 
     with CameraClient(host=args.host, port=args.port) as cam:
