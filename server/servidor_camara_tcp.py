@@ -23,7 +23,7 @@ pueda importarse sin errores.
 import sys
 from unittest.mock import MagicMock
 
-sys.modules['pykms'] = MagicMock()
+sys.modules["pykms"] = MagicMock()
 
 import socket  # noqa: E402
 import struct  # noqa: E402
@@ -33,10 +33,11 @@ from picamera2 import Picamera2  # noqa: E402
 
 # --- Configuración ---
 TCP_HOST = "0.0.0.0"  # Escucha en todas las interfaces de red de la RPi
-TCP_PORT = 5001        # Puerto 5001 para no colisionar con el LIDAR (puerto 5000)
-FRAME_WIDTH = 640      # Ancho del frame en píxeles
-FRAME_HEIGHT = 480     # Alto del frame en píxeles
-JPEG_QUALITY = 80      # Calidad JPEG (0-100). Mayor = más calidad pero más peso
+TCP_PORT = 5001  # Puerto 5001 para no colisionar con el LIDAR (puerto 5000)
+FRAME_WIDTH = 640  # Ancho del frame en píxeles
+FRAME_HEIGHT = 480  # Alto del frame en píxeles
+JPEG_QUALITY = 80  # Calidad JPEG (0-100). Mayor = más calidad pero más peso
+
 
 def configurar_camara():
     """
@@ -53,9 +54,7 @@ def configurar_camara():
 
     # Creamos una configuración de tipo 'still' (captura de imagen)
     # con el tamaño que hemos definido en la configuración
-    config = cam.create_still_configuration(
-        main={"size": (FRAME_WIDTH, FRAME_HEIGHT)}
-    )
+    config = cam.create_still_configuration(main={"size": (FRAME_WIDTH, FRAME_HEIGHT)})
     cam.configure(config)
 
     # Arrancamos la cámara: a partir de aquí ya está capturando
@@ -105,6 +104,7 @@ def enviar_frame(cliente, frame):
     except (BrokenPipeError, ConnectionResetError):
         # El cliente se ha desconectado durante el envío
         return False
+
 
 def main():
     """
