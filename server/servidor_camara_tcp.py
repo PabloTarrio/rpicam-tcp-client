@@ -22,13 +22,14 @@ pueda importarse sin errores.
 # Lo usamos para engañar a picamera2 y que no falle al buscar 'pykms'.
 import sys
 from unittest.mock import MagicMock
+
 sys.modules['pykms'] = MagicMock()
 
-import socket   # Para la comunicación TCP por red
-import struct   # Para empaquetar el tamaño del frame en 4 bytes
+import socket  # noqa: E402
+import struct  # noqa: E402
 
-import cv2                       # OpenCV: para comprimir el frame a JPEG
-from picamera2 import Picamera2  # Librería oficial para la cámara de Raspberry Pi
+import cv2  # noqa: E402
+from picamera2 import Picamera2  # noqa: E402
 
 # --- Configuración ---
 TCP_HOST = "0.0.0.0"  # Escucha en todas las interfaces de red de la RPi
