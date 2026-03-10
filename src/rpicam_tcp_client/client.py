@@ -1,6 +1,7 @@
 """
 Cliente TCP para conectarse al servidor de la Raspberry Pi Camera y recibir frames.
 """
+
 import json
 import socket
 import struct
@@ -14,7 +15,7 @@ class CameraClient:
     Cliente para recibir frames de video desde la Raspberry Pi a través de TCP.
     """
 
-    def __init__(                         
+    def __init__(
         self,
         host: str,
         port: int = 5001,
@@ -91,7 +92,7 @@ class CameraClient:
         """
         if self.connected:
             raise Exception("Ya estás conectado al servidor")
-        
+
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
         self.connected = True
