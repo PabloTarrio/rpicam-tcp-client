@@ -171,6 +171,10 @@ class CameraClient:
             nparr = np.frombuffer(frame_data, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
+            # picamera2 entrega los frames en formato RGB, pero OpenCV trabaja en BGR.
+            # Convertimos para que los colores se muestren correctamente.
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
             return frame
 
         except Exception as e:
