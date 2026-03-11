@@ -103,8 +103,8 @@ def configurar_camara(params: dict):
     """
     # Fusionamos los valores por defecto con los del cliente.
     # Los del cliente tienen prioridad si están presentes.
-    width = params.get("width", FRAME_WIDTH)
-    height = params.get("height", FRAME_HEIGHT)
+    width = FRAME_WIDTH
+    height = FRAME_HEIGHT
     jpeg_quality = params.get("jpeg_quality", JPEG_QUALITY)
 
     cam = Picamera2()
