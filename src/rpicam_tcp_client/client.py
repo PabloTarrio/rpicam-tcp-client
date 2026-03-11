@@ -8,13 +8,10 @@ import struct
 
 import cv2
 import numpy as np
-
-
 class CameraClient:
     """
     Cliente para recibir frames de video desde la Raspberry Pi a través de TCP.
     """
-
     def __init__(
         self,
         host: str,
@@ -37,10 +34,10 @@ class CameraClient:
         Args:
             host (str): Dirección IP de la Raspberry Pi.
             port (int): Puerto del servidor (por defecto 5001).
-            width (int | None): Ancho del frame en píxeles. Si es None, usa
-                el valor por defecto del servidor.
-            height (int | None): Alto del frame en píxeles. Si es None, usa
-                el valor por defecto del servidor.
+            width (int | None): Ancho destino del frame en píxeles. Se aplica
+                localmente con cv2.resize. Si es None, no se escala.
+            height (int | None): Alto destino del frame en píxeles. Se aplica
+                localmente con cv2.resize. Si es None, no se escala.
             jpeg_quality (int | None): Calidad JPEG (0-100). Si es None, usa
                 el valor por defecto del servidor.
             brightness (float | None): Brillo de la imagen. Si es None, usa
@@ -64,10 +61,8 @@ class CameraClient:
         self.connected = False
 
         self._params: dict = {}
-        if width is not None:
-            self._params["width"] = width
-        if height is not None:
-            self._params["height"] = height
+        self._width = width
+        self._height = height
         if jpeg_quality is not None:
             self._params["jpeg_quality"] = jpeg_quality
         if brightness is not None:
@@ -189,6 +184,13 @@ class CameraClient:
                 frame = cv2.rotate(frame, cv2.ROTATE_180)
             elif self._rotation == 270:
                 frame = cv2.rotate(frame, cv2.ROTATE_270_COUNTERCLOCKWISE)
+
+            # 5. Escalar si el usuario especificó width y/o height
+            if self._width is not None or self._height is not None:
+                h, w = frame.shape[:2]
+                target_w = self._width if self._width is not None else w
+                target_h = self._height if self._height is not None else h
+                frame = cv2.resize(frame, (target_w, target_h))
 
             return frame
 
