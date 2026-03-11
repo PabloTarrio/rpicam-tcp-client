@@ -29,6 +29,7 @@ class CameraClient:
         sharpness: float | None = None,
         exposure_time: int | None = None,
         analogue_gain: float | None = None,
+        rotation: int = 0,
     ):
         """
         Inicializa el cliente.
@@ -54,6 +55,8 @@ class CameraClient:
                 Si es None, usa el valor por defecto del servidor.
             analogue_gain (float | None): Ganancia analógica del sensor.
                 Si es None, usa el valor por defecto del servidor.
+            rotation (int): Rotación de la imagen en grados. Valores válidos:
+                (0, 90, 180, 270). Por defecto 0, sin rotación.
         """
         self.host = host
         self.port = port
@@ -79,6 +82,10 @@ class CameraClient:
             self._params["exposure_time"] = exposure_time
         if analogue_gain is not None:
             self._params["analogue_gain"] = analogue_gain
+        if rotation not in (0, 90, 180, 270):
+            msg_rotation = "Rotación debe ser 0, 90, 180 o 270. Recibido:"
+            raise ValueError(f"{msg_rotation}{rotation}")
+        self._rotation = rotation
 
     def connect(self):
         """
@@ -174,6 +181,14 @@ class CameraClient:
             # picamera2 entrega los frames en formato RGB, pero OpenCV trabaja en BGR.
             # Convertimos para que los colores se muestren correctamente.
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+            # 4. Aplicar rotación si el usuario lo especifica
+            if self._rotation == 90:
+                frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+            elif self._rotation == 180:
+                frame = cv2.rotate(frame, cv2.ROTATE_180)
+            elif self._rotation == 270:
+                frame = cv2.rotate(frame, cv2.ROTATE_270_COUNTERCLOCKWISE)
 
             return frame
 
