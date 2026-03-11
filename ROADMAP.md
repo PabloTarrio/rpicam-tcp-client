@@ -40,15 +40,12 @@
         saturation, sharpness, exposure_time, analogue_gain
   * [x] Valores por defecto en servidor, el cliente solo sobreescribe los que quiera
 * [x] Configurar el servidor como servicio `systemd` (arranque automático)
+* [x] Crear `server/README.md` con instrucciones de instalación en la RPi
+* [x] Documentar el servicio en `server/README.md`
 
 ---
 
 ## Pendiente
-
-### Fase 3 - 
-
-* [ ] Crear `server/README.md` con instrucciones de instalación en la RPi
-* [ ] Documentar el servicio en `server/README.md`
 
 ### Fase 4 — Ejemplos de Uso
 - [ ] Crear `examples/` con scripts de ejemplo
