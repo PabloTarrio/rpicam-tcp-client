@@ -16,8 +16,8 @@ dist/
 .idea/
 
 # Archivos multimedia generados por los tests/ejemplos
-*.jpg
-*.jpeg
-*.png
-*.h264
-*.mp4
+# *.jpg
+# *.jpeg
+# *.png
+# *.h264
+# *.mp4
