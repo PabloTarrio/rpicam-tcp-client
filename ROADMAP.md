@@ -50,6 +50,9 @@
   - [x] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
 - [x] `examples/README.md` — documentación pedagógica de los ejemplos
 - [x] `examples/images/` — capturas representativas de los ejemplos
+- [x] Crear `examples/README.md` con descripción de cada ejemplo
+- [x] Publicacion badges en README
+- [x] Creacion de archivos CHANGELOG, CONTRIBUTING, LICENSE
 
 > NOTA de DISEÑO:
 >  * `width` y `height` se aplican localmente en el cliente mediante `cv2.resize`; ya no se envían
@@ -71,11 +74,14 @@
 ## Pendiente
 
 ### Fase 4 — Ejemplos de Uso
-- [ ] Crear `examples/` con scripts de ejemplo
+- [ ] Nuevos ejemplos pendientes
   - [ ] `examples/01_basico/guardar_frame.py` — captura y guarda un frame como imagen
-  - [ ] `show_video.py` — muestra el vídeo en tiempo real con OpenCV
-  - [ ] `save_frame.py` — captura y guarda un frame como imagen
-- [ ] Crear `examples/README.md` con descripción de cada ejemplo
+  - [ ] `examples/02_intermedio/deteccion_objetos.py` 
+  - [ ] `examples/02_intermedio/motion_deteccion.py`
+  - [ ] `examples/02_intermedio/multi_camara.py` - OPCIONAL
+  - [ ] `examples/03_avanzado/streaming_rtsp.py`
+  - [ ] `examples/03_avanzado/recording_timelapse.py`
+- [ ] Actualizar `examples/README.md` con descripción de cada ejemplo
 
 ### Fase 6 — Documentación Final
 - [ ] Escribir `README.md` principal completo
