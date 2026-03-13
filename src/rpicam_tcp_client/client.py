@@ -60,12 +60,11 @@ class CameraClient:
         """
         self.host = host
         self.port = port
-        self.socket = None
+        self.socket: socket.socket | None = None
         self.connected = False
 
+        # Parámetros que se envían al servidor (JSON)
         self._params: dict = {}
-        self._width = width
-        self._height = height
         if jpeg_quality is not None:
             self._params["jpeg_quality"] = jpeg_quality
         if brightness is not None:
@@ -80,6 +79,11 @@ class CameraClient:
             self._params["exposure_time"] = exposure_time
         if analogue_gain is not None:
             self._params["analogue_gain"] = analogue_gain
+
+        # Parámetros locales (solo cliente)
+        self._width = width
+        self._height = height
+
         if rotation not in (0, 90, 180, 270):
             msg_rotation = "Rotación debe ser 0, 90, 180 o 270. Recibido:"
             raise ValueError(f"{msg_rotation}{rotation}")
@@ -89,11 +93,6 @@ class CameraClient:
         """
         Conecta al servidor TCP de la cámara y envía los parámetros
         de configuración como JSON.
-
-        El servidor leerá este JSON antes de empezar a enviar frames,
-        y aplicará los parámetros recibidos sobre sus valores por defecto.
-        Si no se especificó ningún parámetro, se envía un JSON vacío {}
-        y el servidor usará toda su configuración por defecto.
         """
         if self.connected:
             raise Exception("Ya estás conectado al servidor")
@@ -104,12 +103,10 @@ class CameraClient:
         print(f"Conectado a la cámara en {self.host}:{self.port}")
 
         # Serializamos los parámetros a JSON y los enviamos al servidor.
-        # Si _params está vacío, enviamos {} y el servidor usará sus
-        # valores por defecto para todo
         params_json = json.dumps(self._params).encode("utf-8")
 
-        # Primero enviamos el tamaño del JSON en 4 bytes, igual que
-        # hacemos con los frames. Así el servidor sabe cuantos bytes leer.
+        # Primero enviamos el tamaño del JSON en 4 bytes,
+        # igual que hacemos con los frames.
         self.socket.sendall(struct.pack("L", len(params_json)))
         self.socket.sendall(params_json)
         params_info = self._params if self._params else "ninguno (valores por defecto)"
@@ -117,7 +114,7 @@ class CameraClient:
 
     def disconnect(self):
         """
-        Cierra la conexión con el servidor
+        Cierra la conexión con el servidor.
         """
         if self.connected and self.socket:
             self.socket.close()
@@ -133,17 +130,17 @@ class CameraClient:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """
-        Cierra  automáticamente al salir del 'with'
+        Cierra automáticamente al salir del 'with'.
         """
         self.disconnect()
 
-    def get_frame(self):
+    def get_frame(self) -> np.ndarray | None:
         """
-        Recibir un frame de video del servidor y lo decodifica.
+        Recibe un frame de vídeo del servidor y lo decodifica.
 
         Returns:
             np.ndarray: La imagen decodificada lista para mostrar con OpenCV,
-                        o None si hubo un error de conexión
+                        o None si hubo un error de conexión.
         """
         if not self.connected or not self.socket:
             raise Exception("No hay conexión con el servidor")
@@ -176,24 +173,23 @@ class CameraClient:
             nparr = np.frombuffer(frame_data, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # picamera2 entrega los frames en formato RGB, pero OpenCV trabaja en BGR.
-            # Convertimos para que los colores se muestren correctamente.
+            # 4. Convertir RGB → BGR para que OpenCV muestre los colores correctamente
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-            # 4. Aplicar rotación si el usuario lo especifica
+            # 5. Escalar si el usuario especificó width y/o height (local)
+            if self._width is not None or self._height is not None:
+                h, w = frame.shape[:2]
+                target_w = self._width if self._width is not None else w
+                target_h = self._height if self._height is not None else h
+                frame = cv2.resize(frame, (target_w, target_h))
+
+            # 6. Aplicar rotación si el usuario lo especifica (local)
             if self._rotation == 90:
                 frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
             elif self._rotation == 180:
                 frame = cv2.rotate(frame, cv2.ROTATE_180)
             elif self._rotation == 270:
                 frame = cv2.rotate(frame, cv2.ROTATE_270_COUNTERCLOCKWISE)
-
-            # 5. Escalar si el usuario especificó width y/o height
-            if self._width is not None or self._height is not None:
-                h, w = frame.shape[:2]
-                target_w = self._width if self._width is not None else w
-                target_h = self._height if self._height is not None else h
-                frame = cv2.resize(frame, (target_w, target_h))
 
             return frame
 
