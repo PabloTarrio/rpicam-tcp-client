@@ -21,3 +21,10 @@ dist/
 # *.png
 # *.h264
 # *.mp4
+
+# Archivos generador por pytest/coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.pytest_cache/
