@@ -36,6 +36,7 @@
   * [x] Manejo de desconexión del cliente
   * [x] Manejo de cierre limpio (Ctrl+C)
   * [x] Protocolo de parámetros configurables vía JSON
+  * [x] Captura resolución fija (1920*1080), los escalados se aplican en el cliente.
   * [x] Parámetros: width, height, jpeg_quality, brightness, contrast,
         saturation, sharpness, exposure_time, analogue_gain
   * [x] Valores por defecto en servidor, el cliente solo sobreescribe los que quiera
@@ -43,13 +44,21 @@
 * [x] Crear `server/README.md` con instrucciones de instalación en la RPi
 * [x] Documentar el servicio en `server/README.md`
 
+### Fase 4 — Ejemplos de Uso
+- [x] Crear `examples/` con scripts de ejemplo
+  - [x] `examples/01_basico/mostrar_video.py` — vídeo con parámetros personalizados
+  - [x] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
+
+> NOTA de DISEÑO:
+>  * `width` y `height` se aplican localmente en el cliente mediante `cv2.resize`; ya no se envían
+>     al servidor para evitar recortes parciales del sensor
+
 ---
 
 ## Pendiente
 
 ### Fase 4 — Ejemplos de Uso
 - [ ] Crear `examples/` con scripts de ejemplo
-  - [ ] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
   - [ ] `examples/01_basico/guardar_frame.py` — captura y guarda un frame como imagen
   - [ ] `show_video.py` — muestra el vídeo en tiempo real con OpenCV
   - [ ] `save_frame.py` — captura y guarda un frame como imagen
