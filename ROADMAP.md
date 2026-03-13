@@ -48,12 +48,25 @@
 - [x] Crear `examples/` con scripts de ejemplo
   - [x] `examples/01_basico/mostrar_video.py` — vídeo con parámetros personalizados
   - [x] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
+- [x] `examples/README.md` — documentación pedagógica de los ejemplos
+- [x] `examples/images/` — capturas representativas de los ejemplos
 
 > NOTA de DISEÑO:
 >  * `width` y `height` se aplican localmente en el cliente mediante `cv2.resize`; ya no se envían
 >     al servidor para evitar recortes parciales del sensor
+> * `rotation` se aplica localmente en el cliente con `cv2.rotate`; no se envía al servidor
 
----
+### Fase 5 - Tests del cliente
+
+* [x] `tests/test_camera_client.py` — 27 tests unitarios para `CameraClient`
+  * [x] Tests de `__init__`: parámetros JSON, parámetros locales, validación `rotation`
+  * [x] Tests de `connect` / `disconnect` con socket simulado (mock)
+  * [x] Tests de context manager (`with`)
+  * [x] Tests de `get_frame`: escalado, rotación 0/90/180/270, pérdida de conexión
+* [x] Cobertura del 98% con `pytest-cov`
+* [x] `pyproject.toml` actualizado: `pytest-cov` en `dev`, `[tool.pytest.ini_options]`,
+      `[tool.coverage.report]` con `fail_under = 95`
+* [x] CI ejecutando los tests automáticamente en cada PR
 
 ## Pendiente
 
@@ -63,14 +76,6 @@
   - [ ] `show_video.py` — muestra el vídeo en tiempo real con OpenCV
   - [ ] `save_frame.py` — captura y guarda un frame como imagen
 - [ ] Crear `examples/README.md` con descripción de cada ejemplo
-
-### Fase 5 — Tests del Cliente
-- [ ] Crear tests unitarios para `CameraClient` en `tests/`
-  - [ ] Test de conexión y desconexión
-  - [ ] Test del context manager
-  - [ ] Test de `get_frame` con un servidor simulado (mock)
-- [ ] Cobertura de código con `pytest-cov`
-- [ ] CI ejecutando los tests automáticamente en cada PR
 
 ### Fase 6 — Documentación Final
 - [ ] Escribir `README.md` principal completo
@@ -86,6 +91,6 @@
 ## Notas
 - Puerto TCP del servidor de cámara: **5001** (el LIDAR usa el 5000)
 - Hardware: Raspberry Pi 4 con Camera Module 2 NoIR
-- Fecha última actualización: 2026-03-10
+- Fecha última actualización: 2026-03-13
 - Responsable: Pablo M. Tarrío
 - Repositorio: https://github.com/PabloTarrio/rpicam-tcp-client

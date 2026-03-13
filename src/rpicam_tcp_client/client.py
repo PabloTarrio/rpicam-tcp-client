@@ -189,7 +189,7 @@ class CameraClient:
             elif self._rotation == 180:
                 frame = cv2.rotate(frame, cv2.ROTATE_180)
             elif self._rotation == 270:
-                frame = cv2.rotate(frame, cv2.ROTATE_270_COUNTERCLOCKWISE)
+                frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
             return frame
 
