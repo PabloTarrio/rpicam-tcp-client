@@ -55,7 +55,7 @@ Recibiendo video. Pulsa q para salir.
 
 - Todos los parámetro de 'CameraClient'
 - Escalado y rotación local
-- --help completo con `argparse`
+- Uso de `--help` completo con `argparse`
 
 **Uso:**
 
@@ -97,3 +97,60 @@ Conectado a la cámara en 172.16.127.78:5001
 **Controles:**
 
 `q` para cerrar la ventana y finalizar la ejecución del script.
+
+### 3. `guardar_frame.py` - Capturar y guardar una fotografía
+
+**Objetivo:** Capturar un solo frame desde la Rapsberry Pi y guardarlo como imagen JPG en el ordenador remoto.
+
+**¿Qué aprenderás?**
+
+* Uso mínimo de `CameraClient` con context `with`.
+
+* Cómo obtener un frame con `get_frame()` sin bucle de video.
+
+* Guardar imágenes con OpenCV (`cv2.imwrite`).
+
+* Comprobar el efecto de `width`, `height` y `rotation` locales.
+
+**Uso:**
+
+```bash
+# Ejemplo básico: usar valores por defecto
+python guardar_frame.py --host <Raspberry_Pi_IP>
+
+# Guardar con nombre personalizado
+python guardar_frame.py --host <Raspberry_Pi_IP> --output foto.jpg
+
+# Escalado local a 640x480
+python guardar_frame.py --host <Raspberry_Pi_IP> --width 640 --height 480 --output captura_640x480.jpg
+
+# Rotación 90° + brillo configurado en el servidor
+python guardar_frame.py --host <Raspberry_Pi_IP> --rotation 90 --brightness 0.4 --output foto_rotada.jpg
+```
+
+Parámetros clave:
+
+* `--host`: IP de la Raspberry Pi donde reside el servidor (obligatorio)
+
+* `--port`: puerto TCP del servidor (por defecto 5001)
+
+* `--output`: nombre del archivo JPG destino (por defecto `frame.jpg` o similar)
+
+* `--width` / `--height`: Tamaño destino; se aplica solo en el cliente con `cv2.resize`.
+
+* `jpeg-quality`, `brightness`: se envían al serivodr y afectan a la captura.
+
+* `rotation`: rotación local en el cliente (0, 90, 180, 270)
+
+**Salida esperada (ejemplo):**
+
+```text
+Conectando a cámara en 172.16.127.78:5001...
+Conectado a la cámara en 172.16.127.78:5001
+    Parámetros enviados: ninguno (valores por defecto)
+Conectado. Capturando frame...
+Frame capturado: 1920x1080 píxeles (rotation=0°, width=None, height=None)
+Frame guardado: /ruta/completa/frame.jpg
+Desconectado del servidor de la cámara
+```
+
