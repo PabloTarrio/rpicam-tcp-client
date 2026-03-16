@@ -46,6 +46,7 @@
 
 ### Fase 4 — Ejemplos de Uso
 - [x] Crear `examples/` con scripts de ejemplo
+  - [x] `examples/01_basico/guardar_frame.py` — captura y guarda un frame como imagen
   - [x] `examples/01_basico/mostrar_video.py` — vídeo con parámetros personalizados
   - [x] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
 - [x] `examples/README.md` — documentación pedagógica de los ejemplos
@@ -71,11 +72,19 @@
       `[tool.coverage.report]` con `fail_under = 95`
 * [x] CI ejecutando los tests automáticamente en cada PR
 
+### Fase 6 — Documentación Final
+- [x] Escribir `README.md` principal completo
+  - [x] Descripción del proyecto
+  - [x] Requisitos (cliente y servidor)
+  - [x] Instrucciones de instalación
+  - [x] Ejemplo de uso básico
+  - [x] Enlace a `server/README.md` y `examples/README.md`
+- [x] Actualizar `CHANGELOG.md` con versión `0.1.0`
+
 ## Pendiente
 
 ### Fase 4 — Ejemplos de Uso
 - [ ] Nuevos ejemplos pendientes
-  - [ ] `examples/01_basico/guardar_frame.py` — captura y guarda un frame como imagen
   - [ ] `examples/02_intermedio/deteccion_objetos.py` 
   - [ ] `examples/02_intermedio/motion_deteccion.py`
   - [ ] `examples/02_intermedio/multi_camara.py` - OPCIONAL
@@ -83,20 +92,11 @@
   - [ ] `examples/03_avanzado/recording_timelapse.py`
 - [ ] Actualizar `examples/README.md` con descripción de cada ejemplo
 
-### Fase 6 — Documentación Final
-- [ ] Escribir `README.md` principal completo
-  - [ ] Descripción del proyecto
-  - [ ] Requisitos (cliente y servidor)
-  - [ ] Instrucciones de instalación
-  - [ ] Ejemplo de uso básico
-  - [ ] Enlace a `server/README.md` y `examples/README.md`
-- [ ] Actualizar `CHANGELOG.md` con versión `0.1.0`
-
 ---
 
 ## Notas
 - Puerto TCP del servidor de cámara: **5001** (el LIDAR usa el 5000)
 - Hardware: Raspberry Pi 4 con Camera Module 2 NoIR
-- Fecha última actualización: 2026-03-13
+- Fecha última actualización: 2026-03-16
 - Responsable: Pablo M. Tarrío
 - Repositorio: https://github.com/PabloTarrio/rpicam-tcp-client

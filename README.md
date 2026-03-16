@@ -3,7 +3,7 @@
 [![CI](https://github.com/PabloTarrio/rpicam-tcp-client/actions/workflows/ci.yml/badge.svg)](https://github.com/PabloTarrio/rpicam-tcp-client/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)]()
+[![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)](https://github.com/PabloTarrio/rpicam-tcp-client/actions)
 
 Librería Python para acceder remotamente a la **Raspberry Pi Camera Module 2 NoIR**
 mediante TCP.
@@ -36,19 +36,37 @@ mediante TCP.
 
 ## Instalación
 
+**Cliente (PC)**
 ```bash
 git clone https://github.com/PabloTarrio/rpicam-tcp-client.git
 cd rpicam-tcp-client
 pip install -e .
 ```
+
+**Servidor (RPi)**
+```bash
+cd server && pip install -r requirements.txt
+sudo cp camara-tcp.service /etc/systemd/system/
+sudo systemctl enable --now camara-tcp.service
+```
+**Características:**
+
+* Acceso remoto: conecta desde cualquier PC de la red.
+
+* Parámetros configurables: brillo, contraste, saturación, etc.
+
+* Escalado/rotación locales: `cv2.resize()`, `cv2.rotate()` en cliente
+
+* Tests 98%: pytest con mocks (sin RPi real)
+
 ## Uso Básico
 
 ```python
-from rpicam_tcp_client impot CameraClient
+from rpicam_tcp_client import CameraClient
 import cv2
 
 with CameraClient (
-    host= <TU_RASPBERRI_PI_IP>,
+    host= TU_RASPBERRI_PI_IP,
     jpeg_quality= 60,
     saturation= 0.8,
     rotation= 180,
@@ -102,6 +120,7 @@ rpicam-tcp-client/
 |    |___ README.md
 |___ examples/
 |    |___01_basico/
+|    |    |___ guardar_frame.py
 |    |    |___ mostrar_video.py
 |    |    |___ mostrar_video_configurado.py
 |    |___ images/
@@ -135,5 +154,5 @@ ruff format .
 
 ## Licencia
 
-Este proyecto esta bajo licncia MIT. Ver [LICENSE](LICENSE.md) para más detalles.
+Este proyecto esta bajo licencia MIT. Ver [LICENSE](LICENSE.md) para más detalles.
 
