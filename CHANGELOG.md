@@ -5,7 +5,16 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/),
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
----
+## 0.3.0 - 2026-03-16
+
+### Added
+- examples/01_basico/guardar_frame.py (captura JPG única)
+- examples/README.md pedagógico (tablas, ejercicios)
+- README.md principal profesional (badges, instalación 3 comandos)
+- **Fase 6 completada**: Documentación final
+
+### Updated
+- Estructura ejemplos: mostrar_video.py + mostrar_video_configurado.py + guardar_frame.py
 
 ## [0.2.0] - 2026-03-13
 
@@ -25,8 +34,6 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 - Actualización de `server/README.md`
 - Actualización de `ROADMAP.md` con fases completadas
 
----
-
 ## [0.1.0] - 2026-03-13
 
 ### Added
@@ -38,9 +45,6 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 - `ROADMAP.md` con fases del proyecto
 - Test de humo inicial
 
----
-
 ## [Unreleased]
 
-- Rotación de frames en el cliente (`rotation`)
 - Soporte para más resoluciones
