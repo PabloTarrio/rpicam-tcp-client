@@ -50,6 +50,7 @@
   - [x] `examples/01_basico/mostrar_video.py` — vídeo con parámetros personalizados
   - [x] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
   - [x] `examples/02_intermedio/grabar_video.py` - grabar video con timestamp integrado
+  - [x] `examples/02_intermedio/detectar_movimiento.py` - detección de movimiento con BackgroundSubtractor MOG2
 - [x] `examples/README.md` — documentación pedagógica de los ejemplos
 - [x] `examples/images/` — capturas representativas de los ejemplos
 - [x] Crear `examples/README.md` con descripción de cada ejemplo
@@ -86,8 +87,7 @@
 
 ### Fase 4 — Ejemplos de Uso
 - [ ] Nuevos ejemplos pendientes
-  - [ ] `examples/02_intermedio/deteccion_objetos.py` 
-  - [ ] `examples/02_intermedio/motion_deteccion.py`
+  - [ ] `examples/02_intermedio/deteccion_objetos.py`
   - [ ] `examples/02_intermedio/multi_camara.py` - OPCIONAL
   - [ ] `examples/03_avanzado/streaming_rtsp.py`
   - [ ] `examples/03_avanzado/recording_timelapse.py`

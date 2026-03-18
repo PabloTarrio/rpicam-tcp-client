@@ -204,3 +204,54 @@ Video guardado: video.mp4
 ```
 
 **Controles:** `q` en ventana para parar antes del límite
+
+
+
+
+
+### 4. `grabar_video.py` - Grabar video MP4 con timestamps
+
+**Objetivo:** Detectar movimiento en tiempo real usando Background Subtraction
+
+**¿Qué aprenderás?**
+
+- Background Subtraction con `cv2.BackgorundSubtractionMOG2()`
+- Encontrar regiones con cambios con `cv2.findContours()`
+- Dibujar cajas sobre objetos con `cv2.boundingRect()`
+- Filtrar ruido con umbral de área mínima
+
+**Uso:**
+
+```bash
+# Detección básica
+python detectar_movimiento.py --host <Raspberry_Pi_IP>
+
+# Más sensible
+python detectar_movimiento.py --host <Raspberry_Pi_IP> --umbral 10 --area_minima 200
+
+# Con rotación
+python detectar_movimiento.py --host <Raspberry_Pi_IP> --rotation 180
+```
+
+**Parámetros Disponibles:**
+
+| Arg           | Tipo | Descripción                                         |
+| ------------- | ---- | --------------------------------------------------- |
+| --host        | str  | IP Raspberry Pi (obligatorio)                       |
+| --umbral      | int  | Sensibilidad 1-100, menor=más sensible (default 25) |
+| --area_minima | int  | Área mínima px² para detectar (default 500)         |
+| --width       | int  | Ancho frame (default 640)                           |
+| --height      | int  | Alto frame (default 480)                            |
+| --rotation    | int  | Rotación 0,90,180,270 (default 0)                   |
+
+
+**Salida esperada:**
+
+```text
+Conectado a la cámara en 172.16.127.78:5001
+    Parámetros enviados: ninguno (valores por defecto)
+Detectando movimiento. Pulsa 'q' para salir.
+Área mínima: 500px2 | Umbral: 25
+```
+
+**Controles:** `q` en ventana para parar antes del límite
