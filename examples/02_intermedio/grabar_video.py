@@ -97,10 +97,10 @@ def main():
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # Codec H.264
     out = cv2.VideoWriter(
         filename=args.output,
-        fourcc= fourcc,
-        fps= args.fps,
+        fourcc=fourcc,
+        fps=args.fps,
         frameSize=(args.width, args.height),
-        )
+    )
 
     # ===============================================================
     # PASO 4: Conectar Camara
@@ -172,6 +172,7 @@ def main():
     out.release()
     cv2.destroyAllWindows()
     print(f"Video guardado: {args.output}")
+
 
 # =============================================================================
 # EJERCICIOS PARA PRACTICAR:
