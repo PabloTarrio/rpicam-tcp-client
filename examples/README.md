@@ -100,17 +100,17 @@ Conectado a la cámara en 172.16.127.78:5001
 
 ### 3. `guardar_frame.py` - Capturar y guardar una fotografía
 
-**Objetivo:** Capturar un solo frame desde la Rapsberry Pi y guardarlo como imagen JPG en el ordenador remoto.
+**Objetivo:** Capturar UN SOLO frame desde la Rapsberry Pi y guardarlo como imagen JPG en el ordenador remoto. Perfecto para capturas puntuales
 
 **¿Qué aprenderás?**
 
-* Uso mínimo de `CameraClient` con context `with`.
+* Uso mínimo de `CameraClient`: un solo get_frame() sin bucle
 
-* Cómo obtener un frame con `get_frame()` sin bucle de video.
+* Context manager `with`: connect/disconnect automático.
 
 * Guardar imágenes con OpenCV (`cv2.imwrite`).
 
-* Comprobar el efecto de `width`, `height` y `rotation` locales.
+* Diferencia entre parámetros servidor (`jpeg_quality`, `brightness`) y parámetros cliente (`width`, `height`, `rotation`)
 
 **Uso:**
 
@@ -128,19 +128,17 @@ python guardar_frame.py --host <Raspberry_Pi_IP> --width 640 --height 480 --outp
 python guardar_frame.py --host <Raspberry_Pi_IP> --rotation 90 --brightness 0.4 --output foto_rotada.jpg
 ```
 
-Parámetros clave:
+**Parámetros disponibles:**
 
-* `--host`: IP de la Raspberry Pi donde reside el servidor (obligatorio)
-
-* `--port`: puerto TCP del servidor (por defecto 5001)
-
-* `--output`: nombre del archivo JPG destino (por defecto `frame.jpg` o similar)
-
-* `--width` / `--height`: Tamaño destino; se aplica solo en el cliente con `cv2.resize`.
-
-* `jpeg-quality`, `brightness`: se envían al serivodr y afectan a la captura.
-
-* `rotation`: rotación local en el cliente (0, 90, 180, 270)
+| Arg           | Tipo  | Rango        | Dónde se aplica | Descripción                                   |
+| ------------- | ----- | ------------ | --------------- | --------------------------------------------- |
+| --host        | str   | -            | -               | IP Raspberry Pi (obligatorio)                 |
+| --output      | str   | -            | -               | Archivo JPG destino (default captura_cam.jpg) |
+| --width       | int   | 64-1920      | Cliente         | Ancho destino (cv2.resize)                    |
+| --height      | int   | 64-1080      | Cliente         | Alto destino (cv2.resize)                     |
+| --rotation    | int   | 0,90,180,270 | Cliente         | Rotación (cv2.rotate)                         |
+| --jpegquality | int   | 0-100        | Servidor        | Calidad JPEG                                  |
+| --brightness  | float | -1.0 a 1.0   | Servidor        | Brillo (picamera2)                            |
 
 **Salida esperada (ejemplo):**
 
@@ -153,4 +151,56 @@ Frame capturado: 1920x1080 píxeles (rotation=0°, width=None, height=None)
 Frame guardado: /ruta/completa/frame.jpg
 Desconectado del servidor de la cámara
 ```
+> NOTA: El script se cierra automáticamente tras guardar. No hay ventana ni bucle.
 
+## `02_intermedio` - Análisis y exportación
+
+### 4. `grabar_video.py` - Grabar video MP4 con timestamps
+
+**Objetivo:** Grabar vídeo contínuo desde la cámara en formato MP4 con timestamp superpuesto.
+
+**¿Qué aprenderás?**
+
+- Uso de `cv2.VideoWriter` para crear archivos MP4
+- Superponer texto en frames con `cv2.putText`
+- Control de duración con `frames_total = duration * fps`
+- Limitación real de FPS por red TCP (reto en ejercicios)
+
+**Uso:**
+
+```bash
+# Grabación básica 30 segundos
+python grabar_video.py --host <Raspberry_Pi_IP>
+
+# Grabación con duración personalizada
+python grabar_video.py --host <Raspberry_Pi_IP> --duration 60 --output experimento.mp4
+
+# Grabación con rotación
+python grabar_video.py --host <Raspberry_Pi_IP> --duration 10 --rotation 180
+```
+
+**Parámetros Disponibles:**
+
+| Arg        | Tipo | Descripción                             |
+| ---------- | ---- | --------------------------------------- |
+| --host     | str  | IP Raspberry Pi (obligatorio)           |
+| --duration | int  | Duración en segundos (default 30)       |
+| --fps      | int  | FPS configurado (default 15)            |
+| --output   | str  | Archivo MP4 destino (default video.mp4) |
+| --width    | int  | Ancho frame (default 640)               |
+| --height   | int  | Alto frame (default 480)                |
+| --rotation | int  | Rotación 0,90,180,270 (default 0)       |
+
+**Salida esperada:**
+
+```text
+Grabando 30s a 15FPS = 450 frames
+Output: video.mp4 (640x480)
+Conectado a la cámara en 172.16.127.78:5001
+Grabación iniciada. Pulsa 'q' en ventana para parar.
+Progreso: 100.0% (450/450)
+Grabación finalizada.
+Video guardado: video.mp4
+```
+
+**Controles:** `q` en ventana para parar antes del límite
