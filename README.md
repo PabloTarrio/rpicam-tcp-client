@@ -101,11 +101,16 @@ Consulta [README.md](/examples/README.md) para la documentación completa.
 
 ```bash
 # Ejemplo 1: vídeo en tiempo real (valores por defecto)
-python examples/01_basico/mostrar_video.py --host 172.16.127.78
+python examples/01_basico/mostrar_video.py --host <RASPBERRY_PI_IP>
 
 # Ejemplo 2: vídeo con parámetros personalizados
-python examples/01_basico/mostrar_video_configurado.py \
-  --host 172.16.127.78 --width 640 --height 480 --saturation 0.8 --rotation 180
+python examples/01_basico/mostrar_video_configurado.py --host <RASPBERRY_PI_IP> --width 640 --height 480 --saturation 0.8 --rotation 180
+
+# Ejemplo 3: guardar un frame
+python examples/01_basico/guardar_frame.py --host <RASPBERRY_PI_IP>
+
+# Ejmeplo 4: grabar video MP4 con timestamp
+python examples/02_intermedio/grabar_video.py --host <RASPBERRY_PI_IP> --duration 10 --fps 15 --output video.mp4
 ```
 
 ## Estructura del proyecto
@@ -123,6 +128,8 @@ rpicam-tcp-client/
 |    |    |___ guardar_frame.py
 |    |    |___ mostrar_video.py
 |    |    |___ mostrar_video_configurado.py
+|    |___02_intermedio/
+|    |    |___ grabar_video.py
 |    |___ images/
 |    |___ README.md
 |___ tests/

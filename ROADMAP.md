@@ -49,6 +49,7 @@
   - [x] `examples/01_basico/guardar_frame.py` — captura y guarda un frame como imagen
   - [x] `examples/01_basico/mostrar_video.py` — vídeo con parámetros personalizados
   - [x] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
+  - [x] `examples/02_intermedio/grabar_video.py` - grabar video con timestamp integrado
 - [x] `examples/README.md` — documentación pedagógica de los ejemplos
 - [x] `examples/images/` — capturas representativas de los ejemplos
 - [x] Crear `examples/README.md` con descripción de cada ejemplo
@@ -97,6 +98,6 @@
 ## Notas
 - Puerto TCP del servidor de cámara: **5001** (el LIDAR usa el 5000)
 - Hardware: Raspberry Pi 4 con Camera Module 2 NoIR
-- Fecha última actualización: 2026-03-16
+- Fecha última actualización: 2026-03-18
 - Responsable: Pablo M. Tarrío
 - Repositorio: https://github.com/PabloTarrio/rpicam-tcp-client
