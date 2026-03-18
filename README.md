@@ -109,8 +109,12 @@ python examples/01_basico/mostrar_video_configurado.py --host <RASPBERRY_PI_IP> 
 # Ejemplo 3: guardar un frame
 python examples/01_basico/guardar_frame.py --host <RASPBERRY_PI_IP>
 
-# Ejmeplo 4: grabar video MP4 con timestamp
+# Ejemplo 4: grabar video MP4 con timestamp
 python examples/02_intermedio/grabar_video.py --host <RASPBERRY_PI_IP> --duration 10 --fps 15 --output video.mp4
+
+# Ejemplo 5: detección de movimiento en tiempo real
+python examples/02_intermedio/detectar_movimiento.py --host <RASPBERRY_PI_IP> --umbral 10 --area_minima 200
+
 ```
 
 ## Estructura del proyecto
@@ -130,13 +134,13 @@ rpicam-tcp-client/
 |    |    |___ mostrar_video_configurado.py
 |    |___02_intermedio/
 |    |    |___ grabar_video.py
+|    |    |___ detectar_movimiento.py
 |    |___ images/
 |    |___ README.md
 |___ tests/
 |    |___test_smoke.py
 |    |___test_camera_client.py
 |___pyproyect.toml
-
 ```
 
 ## Desarollo
