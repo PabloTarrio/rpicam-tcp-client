@@ -251,3 +251,56 @@ Detectando movimiento. Pulsa 'q' para salir.
 ```
 
 **Controles:** `q` en ventana para parar antes del límite
+
+### 6. `guardar_frames.py` - Secuencia numerada de frames
+
+**Objetivo:** Capturar N frames consecutivos y guardarlos como secuencia numerada. Base para time-lapse, databases de IA y análisis frame a frame.
+
+**¿Qué aprenderás?**
+
+- Bucle `for` finito para capturar exactamente N frames
+- Numeración automática `frame_001.jpg`, `frame_002.jpg`, ...
+- `pathlib.Path` para manejo robusto de rutas y carpetas
+- Barra de progreso con `tqdm`
+
+**Uso:**
+
+```bash
+# Captura basica 100 frames
+python guardar_frames.py --host <Raspberry_Pi_IP>
+
+# Prefijo personalizado y carpeta destino
+python guardar_frames.py --host <Raspberry_Pi_IP> --frames 300 --prefix experimento --output-dir experimento_01
+
+# Time-lapse: ensamblar con ffmpeg
+ffmpeg -r 30 -i frames/frame_%03d.jpg timelapse.mp4
+```
+
+**Parámetros Disponibles:**
+
+| Arg               | Tipo | Descripción                       |
+| ----------------- | ---- | --------------------------------- |
+| --host            | str  | IP Raspberry Pi (obligatorio)     |
+| --frames / -n     | int  | Número de frames (default 100)    |
+| --prefix / -p     | str  | Prefijo archivos (default frame)  |
+| --output-dir / -o | str  | Carpeta destino (default frames)  |
+| --width           | int  | Ancho frame (default 640)         |
+| --height          | int  | Alto frame (default 480)          |
+| --rotation        | int  | Rotación 0,90,180,270 (default 0) |
+
+
+**Salida esperada:**
+
+```text
+Creado directorio: /ruta/frames
+Conectado a la cámara en 172.16.127.78:5001
+Capturando 100 frames...
+Formato: frame_001.jpg, frame_002.jpg,...
+Capturando: 100%|████████████| 100/100 [00:32<00:00]
+
+Secuencia completada: /ruta/framesara salir.
+Área mínima: 500px2 | Umbral: 25
+```
+> NOTA: Sin ventana gráfica. La barra de `tqdm` muestra el progreso en terminal
+
+**Controles:** En este caso no existe un control específico, `Ctrl+C` termina la ejecición desde la terminal

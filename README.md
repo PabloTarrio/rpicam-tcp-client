@@ -115,6 +115,8 @@ python examples/02_intermedio/grabar_video.py --host <RASPBERRY_PI_IP> --duratio
 # Ejemplo 5: detección de movimiento en tiempo real
 python examples/02_intermedio/detectar_movimiento.py --host <RASPBERRY_PI_IP> --umbral 10 --area_minima 200
 
+# Ejemplo 6: secuencia numerada de frames (time-lapse/dataset)
+python examples/02_intermedio/guardar_frames.py --host 172.16.127.78 --frames 300 --prefix experimento
 ```
 
 ## Estructura del proyecto
@@ -135,6 +137,7 @@ rpicam-tcp-client/
 |    |___02_intermedio/
 |    |    |___ grabar_video.py
 |    |    |___ detectar_movimiento.py
+|    |    |___ guardar_frames.py
 |    |___ images/
 |    |___ README.md
 |___ tests/
