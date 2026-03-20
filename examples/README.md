@@ -205,11 +205,7 @@ Video guardado: video.mp4
 
 **Controles:** `q` en ventana para parar antes del límite
 
-
-
-
-
-### 4. `grabar_video.py` - Grabar video MP4 con timestamps
+### 5. `detectar_movimiento.py` - Grabar video MP4 con timestamps
 
 **Objetivo:** Detectar movimiento en tiempo real usando Background Subtraction
 
