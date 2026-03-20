@@ -93,16 +93,16 @@ def main():
         type=int,
         default=180,
         choices=[0, 90, 180, 270],
-        help="Rotación de la imagen [0, 90, 180, 270] (por defecto 180)"
+        help="Rotación de la imagen [0, 90, 180, 270] (por defecto 180)",
     )
     parser.add_argument(
         "--saturation",
         type=float,
         default=0.6,
-        help="Saturación de la imagen (por defecto 0.6)"
+        help="Saturación de la imagen (por defecto 0.6)",
     )
     args = parser.parse_args()
-    
+
     # ===============================================================
     # PASO 2: Definir rangos HSV para el color seleccionado
     #   Cada color se define con dos arrays numpy: limite inferior y superior
@@ -121,12 +121,12 @@ def main():
     # PASO 3: Crear CameraClient y conectar con Raspberry Pi.
     # ===============================================================
     with CameraClient(
-        host= args.host,
-        port= args.port,
-        width= args.width,
-        height= args.height,
-        rotation= args.rotation,
-        saturation= args.saturation,
+        host=args.host,
+        port=args.port,
+        width=args.width,
+        height=args.height,
+        rotation=args.rotation,
+        saturation=args.saturation,
     ) as cam:
         print(f"Conectado a la cámara en {args.host}:{args.port}")
         print(f"Detectando color: {args.color}. Pulsa 'q' para salir.")
@@ -137,7 +137,6 @@ def main():
         cv2.namedWindow("Detector de color", cv2.WINDOW_NORMAL)
         cv2.namedWindow("Máscara", cv2.WINDOW_NORMAL)
         try:
-
             while True:
                 frame = cam.get_frame()
                 if frame is None:
@@ -147,7 +146,7 @@ def main():
                 hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
                 # 4.2 Crear máscara binaria con cv2.inRange()
                 mascara = cv2.inRange(hsv, limite_inferior, limite_superior)
-                
+
                 # 4.3 Calcular el centroide con cv2.moments()
                 momentos = cv2.moments(mascara)
                 print(f"m00 = {momentos['m00']:.0f}")
@@ -162,7 +161,7 @@ def main():
                         center=(cx, cy),
                         radius=10,
                         color=(0, 255, 0),
-                        thickness=-1
+                        thickness=-1,
                     )
                     cv2.putText(
                         img=frame,
@@ -182,7 +181,7 @@ def main():
 
         except KeyboardInterrupt:
             print("\nDetección solicitada por el usuario.")
-        
+
         finally:
             # ===============================================================
             # PASO 5: Cerrar ventanas al salir
