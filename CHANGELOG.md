@@ -5,6 +5,19 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/),
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.4.0] - 2026-03-20
+
+### Added
+- `examples/02_intermedio/grabar_video.py`: grabación MP4 con
+  timestamp y control FPS
+- `examples/02_intermedio/detectar_movimiento.py`: detección de
+  movimiento con BackgroundSubtractor MOG2 y contornos
+- `examples/02_intermedio/guardar_frames.py`: secuencia numerada
+  de frames para time-lapse y datasets de IA
+- `tqdm` añadida como dependencia en `pyproject.toml`
+- `examples/README.md`: documentación completa ejemplos 4, 5 y 6
+- `README.md`: estructura y ejemplos 02_intermedio actualizados
+
 ## 0.3.0 - 2026-03-16
 
 ### Added

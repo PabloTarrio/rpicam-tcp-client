@@ -51,6 +51,7 @@
   - [x] `examples/01_basico/mostrar_video_configurado.py` — vídeo con parámetros personalizados
   - [x] `examples/02_intermedio/grabar_video.py` - grabar video con timestamp integrado
   - [x] `examples/02_intermedio/detectar_movimiento.py` - detección de movimiento con BackgroundSubtractor MOG2
+  - [x] `examples/o2_intermedio/guardar_frames.py` - Guardar multiples frames para generar time-lapse o datasets
 - [x] `examples/README.md` — documentación pedagógica de los ejemplos
 - [x] `examples/images/` — capturas representativas de los ejemplos
 - [x] Crear `examples/README.md` con descripción de cada ejemplo
@@ -87,10 +88,9 @@
 
 ### Fase 4 — Ejemplos de Uso
 - [ ] Nuevos ejemplos pendientes
-  - [ ] `examples/02_intermedio/deteccion_objetos.py`
-  - [ ] `examples/02_intermedio/multi_camara.py` - OPCIONAL
-  - [ ] `examples/03_avanzado/streaming_rtsp.py`
-  - [ ] `examples/03_avanzado/recording_timelapse.py`
+  - [ ] `examples/03_avanzado/detector_color.py`
+  - [ ] `examples/03_avanzado/calibrar_camara.py`
+  - [ ] `examples/03_avanzado/medir_distancia_visual.py`
 - [ ] Actualizar `examples/README.md` con descripción de cada ejemplo
 
 ---
@@ -98,6 +98,6 @@
 ## Notas
 - Puerto TCP del servidor de cámara: **5001** (el LIDAR usa el 5000)
 - Hardware: Raspberry Pi 4 con Camera Module 2 NoIR
-- Fecha última actualización: 2026-03-18
+- Fecha última actualización: 2026-03-20
 - Responsable: Pablo M. Tarrío
 - Repositorio: https://github.com/PabloTarrio/rpicam-tcp-client

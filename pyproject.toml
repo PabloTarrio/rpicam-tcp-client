@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy",
-    "opencv-python"
+    "opencv-python",
+    "tqdm",
 ]
 license = {text = "MIT"}
 authors = [
