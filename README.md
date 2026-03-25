@@ -117,6 +117,13 @@ python examples/02_intermedio/detectar_movimiento.py --host <RASPBERRY_PI_IP> --
 
 # Ejemplo 6: secuencia numerada de frames (time-lapse/dataset)
 python examples/02_intermedio/guardar_frames.py --host 172.16.127.78 --frames 300 --prefix experimento
+
+# Ejemplo 7: detector de color en tiempo real
+python examples/03_avanzado/detector_color.py --host <RASPBERRY_PI_IP> --color rojo
+
+# Ejemplo 8: calibración de cámara con tablero de ajedrez
+python examples/03_avanzado/calibrar_camara.py --host <RASPBERRY_PI_IP> --capturas 15
+
 ```
 
 ## Estructura del proyecto
@@ -138,6 +145,9 @@ rpicam-tcp-client/
 |    |    |___ grabar_video.py
 |    |    |___ detectar_movimiento.py
 |    |    |___ guardar_frames.py
+|    |___03_avanzado/
+|    |    |___ detectar_color.py
+|    |    |___ calibrar_camara.py
 |    |___ images/
 |    |___ README.md
 |___ tests/

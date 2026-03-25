@@ -153,7 +153,7 @@ Desconectado del servidor de la cámara
 ```
 > NOTA: El script se cierra automáticamente tras guardar. No hay ventana ni bucle.
 
-## `02_intermedio` - Análisis y exportación
+## `02_intermedio/` - Análisis y exportación
 
 ### 4. `grabar_video.py` - Grabar video MP4 con timestamps
 
@@ -304,3 +304,115 @@ Secuencia completada: /ruta/framesara salir.
 > NOTA: Sin ventana gráfica. La barra de `tqdm` muestra el progreso en terminal
 
 **Controles:** En este caso no existe un control específico, `Ctrl+C` termina la ejecición desde la terminal
+
+## `03_avanzado/` - Procesamiento avanzado
+
+### 7.`detector_color.py` - Detección y rastreo de objetos por color
+
+**Objetivo:** Detectar y rastrear objetos por color en tiempo real usando el espacio HSV y el cálculo del centroide
+
+**¿Qué aprenderás?**
+
+- Por qué HSV es más robusto que BGR para detectar colores
+- Crear una máscara binaria con `cv2.inRange()`
+- Calcular el centroide de un objeto con `cv2.moments()`
+- Dibujar anotaciones sobre el frame en tiempo real
+
+**Uso:**
+
+```bash
+# Detección de color rojo (por defecto)
+python detector_color.py --host <Raspberry_Pi_IP>
+
+# Detección de color azul con resolución reducida
+python detector_color.py --host <Raspberry_Pi_IP> --color azul --width 640 --height 480
+
+# Con rotación y saturación ajustada
+python detector_color.py --host <Raspberry_Pi_IP> --color verde --rotation 180 --saturation 0.8
+```
+
+**Parámetros disponibles:**
+
+| Arg | Tipo | Descripción |
+|---|---|---|
+| `--host` | `str` | IP Raspberry Pi (obligatorio) |
+| `--color` | `str` | Color a detectar: `rojo`, `verde`, `azul`, `amarillo` (default: `rojo`) |
+| `--width` | `int` | Ancho frame cliente (default: 640) |
+| `--height` | `int` | Alto frame cliente (default: 480) |
+| `--rotation` | `int` | Rotación 0,90,180,270 (default: 180) |
+| `--saturation` | `float` | Saturación servidor (default: 0.6) |
+
+**Salida esperada:**
+
+```text
+Conectado a la cámara en 172.16.127.78:5001
+Detectando color: rojo. Pulsa 'q' para salir.
+```
+
+> NOTA: Se muestran dos ventanas — el frame con el centroide marcado
+> en verde y la máscara binaria del color detectado.
+
+**Controles:** `q` para cerrar y finalizar.
+
+### 8. `calibrar_camara.py` - Calibración con tablero de ajedrez
+
+**Objetivo:** Calcular la matriz intrínseca y los coeficientes de
+distorsión de la cámara usando un tablero de ajedrez estándar.
+
+**¿Qué aprenderás?**
+
+- Qué es la matriz intrínseca K (distancia focal y centro óptico)
+- Qué son los coeficientes de distorsión radial y tangencial
+- Detectar esquinas automáticamente con `cv2.findChessboardCorners()`
+- Refinar a nivel subpíxel con `cv2.cornerSubPix()`
+- Guardar los parámetros en `.npz` para usarlos en otros scripts
+
+**Uso:**
+
+```bash
+# Calibración básica (20 capturas por defecto)
+python calibrar_camara.py --host <Raspberry_Pi_IP>
+
+# Calibración rápida con 5 capturas
+python calibrar_camara.py --host <Raspberry_Pi_IP> --capturas 5
+
+# Guardar en ruta personalizada
+python calibrar_camara.py --host <Raspberry_Pi_IP> --capturas 15 --salida output/calibracion.npz
+```
+
+**Parámetros disponibles:**
+
+| Arg | Tipo | Descripción |
+|---|---|---|
+| `--host` | `str` | IP Raspberry Pi (obligatorio) |
+| `--capturas` | `int` | Capturas necesarias para calibrar (default: 20) |
+| `--esquinas-x` | `int` | Esquinas interiores horizontales (default: 9) |
+| `--esquinas-y` | `int` | Esquinas interiores verticales (default: 6) |
+| `--width` | `int` | Ancho frame (default: 640) |
+| `--height` | `int` | Alto frame (default: 480) |
+| `--salida` | `str` | Archivo `.npz` de salida (default: `calibracion.npz`) |
+
+**Salida esperada:**
+
+```text
+Conectado a la cámara en 172.16.127.78:5001
+Capturas necesarias: 5
+Pulsa 'c' para capturar - 'q' para salir.
+Captura 1/5 registrada.
+...
+Captura 5/5 registrada.
+Capturas completadas. Calculando calibración...
+Calibración guardada en: calibracion.npz
+Error de reproyeccion: 0.0867 pixeles
+Matriz intrínseca K:
+[[844.45  0.    318.27]
+ [  0.   563.10 254.68]
+ [  0.     0.     1.  ]]
+```
+
+> NOTA: Necesitas un tablero de ajedrez de 9×6 esquinas interiores.
+> Puedes imprimirlo desde [images](/examples/images/chessboard_pattern.png) o desde el repositorio oficial de [OpenCV:](https://github.com/opencv/opencv/blob/master/doc/pattern.png)
+>
+> Un error de reproyección < 1.0 px indica buena calibración.
+
+**Controles:** `c` para capturar (solo si el tablero es visible) — `q` para salir.
