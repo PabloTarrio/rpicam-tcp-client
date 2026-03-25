@@ -95,8 +95,7 @@ def main():
     parser.add_argument(
         "--salida",
         default="calib_camara.npz",
-        help="Archivo de salida con los parámetros"
-        "por defecto: 'calib_camara.npz'",
+        help="Archivo de salida con los parámetrospor defecto: 'calib_camara.npz'",
     )
     args = parser.parse_args()
 
@@ -219,7 +218,7 @@ def main():
             # PASO 5 - Cerrar ventana
             # =========================================================
             cv2.destroyAllWindows()
-    
+
     # =================================================================
     # PASO 6 - Calcular calibración y guardar resultados
     # Solo calculamos si se acumularon suficientes capturas válidas
@@ -229,7 +228,7 @@ def main():
     if len(lista_puntos_2d) < 2:
         print("No hay suficientes capturas para calibrar. Saliendo.")
         return
-    
+
     print("Calculando parámetros de calibración...")
     error, matriz_k, coef_distorsion, _, _ = cv2.calibrateCamera(
         objectPoints=lista_puntos_3d,
