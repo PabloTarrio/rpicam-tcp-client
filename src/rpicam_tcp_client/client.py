@@ -173,8 +173,10 @@ class CameraClient:
             nparr = np.frombuffer(frame_data, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # 4. Convertir RGB → BGR para que OpenCV muestre los colores correctamente
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            # 4 El servidor envía RGB, cv2.imdecode lo decodifica como BGR
+            # -> necesitamos convertir BGR→RGB→BGR, o simplemente usar IMREAD_COLOR
+            # La conversión correcta es BGR2RGB seguida de nada, o eliminar y usar:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             # 5. Escalar si el usuario especificó width y/o height (local)
             if self._width is not None or self._height is not None:
