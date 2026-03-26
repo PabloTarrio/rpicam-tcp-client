@@ -5,6 +5,19 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/),
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.5.0] - 2026-03-26
+
+### Added
+- `examples/03_avanzado/detector_color.py`: detección y rastreo de
+  objetos por color en espacio HSV con cálculo de centroide
+- `examples/03_avanzado/calibrar_camara.py`: calibración con tablero
+  de ajedrez, genera matriz K y coeficientes en archivo `.npz`
+- `examples/03_avanzado/medir_distancia_visual.py`: estimación de
+  distancia real usando fórmula de triángulos similares D=(W×f)/P
+- `examples/README.md`: documentación pedagógica ejemplos 7, 8 y 9
+- `README.md`: estructura y ejemplos `03_avanzado` actualizados
+- `ROADMAP.md`: Fase 4 completada al 100%
+
 ## [0.4.0] - 2026-03-20
 
 ### Added

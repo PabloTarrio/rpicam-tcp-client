@@ -124,6 +124,8 @@ python examples/03_avanzado/detector_color.py --host <RASPBERRY_PI_IP> --color r
 # Ejemplo 8: calibración de cámara con tablero de ajedrez
 python examples/03_avanzado/calibrar_camara.py --host <RASPBERRY_PI_IP> --capturas 15
 
+# Ejemplo 9: medición de distancia visual con cámara calibrada
+python examples/03_avanzado/medir_distancia_visual.py --host <RASPBERRY_PI_IP> --ancho-real 10
 ```
 
 ## Estructura del proyecto
@@ -148,6 +150,7 @@ rpicam-tcp-client/
 |    |___03_avanzado/
 |    |    |___ detectar_color.py
 |    |    |___ calibrar_camara.py
+|    |    |___ medir_distancia_visual.py
 |    |___ images/
 |    |___ README.md
 |___ tests/
