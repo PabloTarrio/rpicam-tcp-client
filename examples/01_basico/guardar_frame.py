@@ -78,13 +78,13 @@ def main():
         "--host",
         default=cfg_conexion.get("host"),
         help="IP de la Raspberry Pi",
-        )
+    )
     parser.add_argument(
         "--port",
         type=int,
         default=cfg_conexion.get("port", 5001),
         help="Puerto TCP",
-        )
+    )
     parser.add_argument(
         "--output",
         "-o",
@@ -96,25 +96,25 @@ def main():
         type=int,
         default=cfg_camara.get("width"),
         help="Ancho destino (local)",
-        )
+    )
     parser.add_argument(
         "--height",
         type=int,
         default=cfg_camara.get("height"),
         help="Alto destino (local)",
-        )
+    )
     parser.add_argument(
         "--jpeg_quality",
         type=int,
         default=cfg_camara.get("jpeg_quality"),
         help="JPEG 0-100",
-        )
+    )
     parser.add_argument(
         "--brightness",
         type=float,
         default=cfg_camara.get("brightness"),
         help="-1.0 a 1.0",
-        )
+    )
     parser.add_argument(
         "--rotation",
         type=int,
@@ -182,7 +182,7 @@ def main():
 # =============================================================================
 # EJERCICIOS PARA PRACTICAR:
 # =============================================================================
-# 1. **Captura comparativa**: Guarda 3 imágenes variando `--jpegquality` (30, 70, 95). 
+# 1. **Captura comparativa**: Guarda 3 imágenes variando `--jpegquality` (30, 70, 95).
 #                             Compara tamaños de archivo vs. calidad visual.
 # 2. **Escalado y rotación**: Captura una imagen con:
 #                             --width 640 --height 480 --rotation 90`.
@@ -192,8 +192,8 @@ def main():
 #                             Documenta en `config_lab.json`.
 # 4. **Timelapse básico**:    Modifica para capturar 10 frames con:
 #                  `          --output frame_{i:03d}.jpg`. Crea GIF con `ffmpeg`.
-# 5. **Dataset visión**:      Captura 50 imágenes variando parámetros. 
-#                             Organiza en carpetas por clase 
+# 5. **Dataset visión**:      Captura 50 imágenes variando parámetros.
+#                             Organiza en carpetas por clase
 #                             (bien_iluminado, bajo_brillo).
 
 if __name__ == "__main__":

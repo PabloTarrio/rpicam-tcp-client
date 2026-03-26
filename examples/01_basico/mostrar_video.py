@@ -63,7 +63,7 @@ def main():
     # o lo svalores por defecto del argparse se usarán
     cfg = load_config()
     cfg_conexion = cfg.get("conexion", {})
-    
+
     # =========================================================================
     # PASO 2: Parsear argumentos de línea de comandos
     # =========================================================================
@@ -73,9 +73,8 @@ def main():
         description="Muestra vídeo desde la Raspberry Pi (valores por defecto)."
     )
     parser.add_argument(
-        "--host",
-        default=cfg_conexion.get("host"),
-        help="IP de la Raspberry Pi")
+        "--host", default=cfg_conexion.get("host"), help="IP de la Raspberry Pi"
+    )
     parser.add_argument(
         "--port",
         type=int,
@@ -154,6 +153,7 @@ def main():
 
     cv2.destroyAllWindows()
     print("Ejemplo completado exitosamente.")
+
 
 # =============================================================================
 # EJERCICIOS PARA PRACTICAR:
