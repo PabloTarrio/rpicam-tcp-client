@@ -54,6 +54,7 @@
   - [x] `examples/o2_intermedio/guardar_frames.py` - Guardar multiples frames para generar time-lapse o datasets
   - [x] `examples/03_avanzado/detector_color.py`
   - [x] `examples/03_avanzado/calibrar_camara.py`
+  - [x] `examples/03_avanzado/medir_distancia_visual.py`
 - [x] `examples/README.md` — documentación pedagógica de los ejemplos
 - [x] `examples/images/` — capturas representativas de los ejemplos
 - [x] Crear `examples/README.md` con descripción de cada ejemplo
@@ -88,16 +89,11 @@
 
 ## Pendiente
 
-### Fase 4 — Ejemplos de Uso
-- [ ] Nuevos ejemplos pendientes
-  - [ ] `examples/03_avanzado/medir_distancia_visual.py`
-- [ ] Actualizar `examples/README.md` con descripción de cada ejemplo
-
 ---
 
 ## Notas
 - Puerto TCP del servidor de cámara: **5001** (el LIDAR usa el 5000)
 - Hardware: Raspberry Pi 4 con Camera Module 2 NoIR
-- Fecha última actualización: 2026-03-25
+- Fecha última actualización: 2026-03-26
 - Responsable: Pablo M. Tarrío
 - Repositorio: https://github.com/PabloTarrio/rpicam-tcp-client

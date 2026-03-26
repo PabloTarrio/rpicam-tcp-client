@@ -416,3 +416,53 @@ Matriz intrínseca K:
 > Un error de reproyección < 1.0 px indica buena calibración.
 
 **Controles:** `c` para capturar (solo si el tablero es visible) — `q` para salir.
+
+### 9. `medir_distancia_visual.py` - Medir distancia a un objeto
+
+**Objetivo:** Estimar la distancia a un objeto de tamaño conocido en
+tiempo real usando la calibración de cámara y detección por color.
+
+**¿Qué aprenderás?**
+
+- Cargar la matriz intrínseca K desde un archivo `.npz`
+- Extraer la distancia focal `fx` de la matriz K
+- Medir el ancho de un objeto en píxeles con `cv2.boundingRect()`
+- Aplicar la fórmula D = (W × f) / P para estimar la distancia
+
+**Uso:**
+
+```bash
+# Medir distancia a un objeto rojo de 10 cm de ancho
+python medir_distancia_visual.py --host <Raspberry_Pi_IP> --ancho-real 10
+
+# Con color azul y calibración en ruta personalizada
+python medir_distancia_visual.py --host <Raspberry_Pi_IP> --ancho-real 15 --color azul --calibracion output/calibracion.npz
+```
+
+**Parámetros disponibles:**
+
+| Arg | Tipo | Descripción |
+|---|---|---|
+| `--host` | `str` | IP Raspberry Pi (obligatorio) |
+| `--ancho-real` | `float` | Ancho real del objeto en cm (obligatorio) |
+| `--color` | `str` | Color del objeto: `rojo`, `verde`, `azul`, `amarillo` (default: `rojo`) |
+| `--calibracion` | `str` | Ruta al archivo `.npz` (default: `calibracion.npz`) |
+| `--width` | `int` | Ancho frame cliente (default: 640) |
+| `--height` | `int` | Alto frame cliente (default: 480) |
+| `--rotation` | `int` | Rotación 0,90,180,270 (default: 180) |
+
+**Salida esperada:**
+
+```text
+Calibración cargada desde 'calibracion.npz'
+Distancia focal f(x): 844.45 píxeles
+Conectado a la cámara en 172.16.127.78:5001
+Detectando color: rojo | Ancho real: 10.0 cm
+Pulsa 'q' para salir
+```
+
+> NOTA: Requiere `calibracion.npz` generado previamente con
+> `calibrar_camara.py`. Sin ese archivo el script termina con un
+> mensaje de error informativo.
+
+**Controles:** `q` para cerrar y finalizar.
