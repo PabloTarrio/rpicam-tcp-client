@@ -1,7 +1,7 @@
 """
 config_loader.py - Cargador de configuración gloabl para los ejemplos.
 
-Busca config.json en la raiz del proyecto. Si no existe, devuelve un 
+Busca config.json en la raiz del proyecto. Si no existe, devuelve un
 diccionario vacío y cada script usará sus valores por defecto.
 
 Uso en cualquier script de examples/:
@@ -12,6 +12,7 @@ Uso en cualquier script de examples/:
 
 import json
 from pathlib import Path
+
 
 def load_config() -> dict:
     """
@@ -26,6 +27,6 @@ def load_config() -> dict:
 
     if not config_path.exists():
         return {}
-    
+
     with open(config_path, encoding="utf-8") as f:
         return json.load(f)

@@ -41,8 +41,9 @@ import cv2
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from rpicam_tcp_client import CameraClient
 from config_loader import load_config
+
+from rpicam_tcp_client import CameraClient
 
 
 def main():
