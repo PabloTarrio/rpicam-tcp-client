@@ -89,6 +89,26 @@
 
 ## Pendiente
 
+### Fase 7 - Archivo de configuración global (v0.6.0)
+- [ ] Diseñar `config.example.json` con todos los parámetros comunes
+- [ ] Añadir `config.json` al `.gitignore`
+- [ ] Crear función helper `load_config()` reutilizable por todos los scripts
+- [ ] Adaptar 9 scripts de ejemplo para usar load_config()
+- [ ] Actualizar `examples\README.md` con instrucciones de configuración
+- [ ] Actualizar `README.md` principal con sección de primeros pasos
+
+### Fase 8 - Publicacion en PyPI (v1.0.0)
+- [ ] Revisar y completar metadatos en `pyproject.toml`
+- [ ] Generar el paquete con `build`
+- [ ] Publicar en TestPyPI y verificar instalación
+- [ ] Publicar en PyPI oficial
+- [ ] Actualizar `README.md` con badge e instrucciones `pip install`
+
+
+### IDEAS FUTURAS
+- [ ] Grabación activada por detección de movimiento (tipo cámara de seguridad)
+- [ ] Detección de objetos con IA (YOLOv8-nano o MobileNet SSD)
+- [ ] Soporte multicliente en el servidor (threading/asyncio)
 ---
 
 ## Notas
