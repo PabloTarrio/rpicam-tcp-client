@@ -96,6 +96,8 @@
 - [ ] Adaptar 9 scripts de ejemplo para usar load_config()
 - [ ] Actualizar `examples\README.md` con instrucciones de configuración
 - [ ] Actualizar `README.md` principal con sección de primeros pasos
+- [ ] Documentar en `README.md` problema conocido de fuente Qt con opencv-python
+      y su solución (`cp dejavi fonts -> .venv/cv2/qt/fonts/`)
 
 ### Fase 8 - Publicacion en PyPI (v1.0.0)
 - [ ] Revisar y completar metadatos en `pyproject.toml`

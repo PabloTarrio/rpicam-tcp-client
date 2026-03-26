@@ -34,8 +34,14 @@ DETENER: Pulsa `q` en la ventana para salir
 """
 
 import argparse
+import sys
+from pathlib import Path
 
 import cv2
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 from rpicam_tcp_client import CameraClient
 
@@ -45,46 +51,91 @@ def main():
     Función principal con configuración completa desde argumentos.
 
     Flujo del programa:
-        1. argparse con 12 parámetros opcionales
-        2. Crear CameraClient pasando TODO al servidor
-        3. Conectar → servidor aplica JSON recibido
-        4. Bucle: get_frame() → rotar → escalar → mostrar
-        5. Salir con 'q' + limpieza automática
+        1. Cargar config.kson (si existe)
+        2. argparse con 12 parámetros opcionales
+        3. Crear CameraClient pasando TODO al servidor
+        4. Conectar → servidor aplica JSON recibido
+        5. Bucle: get_frame() → rotar → escalar → mostrar
+        6. Salir con 'q' + limpieza automática
     """
+    # =========================================================================
+    # PASO 1: Cargar configuración desde config.json (si existe)
+    # =========================================================================
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    cfg_camara = cfg.get("camara", {})
 
     # =========================================================================
-    # PASO 1: Parsear 12 parámetros opcionales con argparse
+    # PASO 2: Parsear 12 parámetros opcionales con argparse
     # =========================================================================
-    # Cada parámetro se pasa a CameraClient si != None.
-    # El servidor fusiona con sus valores por defecto.
-
     parser = argparse.ArgumentParser(
         description="Muestra video configurado desde el cliente."
     )
-    parser.add_argument("--host", required=True, help="IP Raspberry Pi")
-    parser.add_argument("--port", type=int, default=5001, help="Puerto TCP")
+    parser.add_argument(
+        "--host",
+        default=cfg_conexion.get("host"),
+        help="IP Raspberry Pi",
+    )
+    parser.add_argument(
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
+    )
 
-    # Parámetros SERVIDOR (JSON)
-    parser.add_argument("--width", type=int, default=None, help="Ancho destino")
-    parser.add_argument("--height", type=int, default=None, help="Alto destino")
-    parser.add_argument("--jpeg_quality", type=int, default=None, help="JPEG 0-100")
-    parser.add_argument("--brightness", type=float, default=None, help="-1.0 a 1.0")
-    parser.add_argument("--contrast", type=float, default=None, help="0.0-32.0")
-    parser.add_argument("--saturation", type=float, default=None, help="0.0-32.0")
-    parser.add_argument("--sharpness", type=float, default=None, help="0.0-16.0")
-    parser.add_argument("--exposure_time", type=int, default=None, help="µs 114-694267")
-    parser.add_argument("--analogue_gain", type=float, default=None, help="1.0-16.0")
+    parser.add_argument(
+        "--width", type=int, default=cfg_camara.get("width"), help="Ancho destino"
+    )
+    parser.add_argument(
+        "--height", type=int, default=cfg_camara.get("height"), help="Alto destino"
+    )
+    parser.add_argument(
+        "--jpeg_quality",
+        type=int,
+        default=cfg_camara.get("jpeg-quality"),
+        help="JPEG 0-100",
+    )
+    parser.add_argument(
+        "--brightness",
+        type=float,
+        default=cfg_camara.get("brightness"),
+        help="-1.0 a 1.0",
+    )
+    parser.add_argument(
+        "--contrast", type=float, default=cfg_camara.get("contrast"), help="0.0-32.0"
+    )
+    parser.add_argument(
+        "--saturation",
+        type=float,
+        default=cfg_camara.get("saturation"),
+        help="0.0-32.0",
+    )
+    parser.add_argument(
+        "--sharpness", type=float, default=cfg_camara.get("sharpness"), help="0.0-16.0"
+    )
+    parser.add_argument(
+        "--exposure_time",
+        type=int,
+        default=cfg_camara.get("exposure_time"),
+        help="µs 114-694267",
+    )
+    parser.add_argument(
+        "--analogue_gain",
+        type=float,
+        default=cfg_camara.get("analogue_gain"),
+        help="1.0-16.0",
+    )
 
     # Parámetros CLIENTE (local)
     parser.add_argument(
         "--rotation",
         type=int,
-        default=0,
+        default=cfg_camara.get("rotation"),
         choices=[0, 90, 180, 270],
         help="Rotación grados",
     )
 
     args = parser.parse_args()
+
+    if args.host is None:
+        print("Error: indica --host o configura 'host en config.json")
 
     # Mostrar parámetros que se enviarán
     params_servidor = {
@@ -107,11 +158,8 @@ def main():
     print(f"Parámetros SERVIDOR: {params_servidor}")
 
     # =========================================================================
-    # PASO 2: Crear CameraClient con mezcla servidor+cliente
+    # PASO 3: Crear CameraClient con mezcla servidor+cliente
     # =========================================================================
-    # 9 parámetros → JSON al servidor
-    # 3 parámetros → procesados localmente (width/height/rotation)
-
     cam = CameraClient(
         host=args.host,
         port=args.port,
@@ -130,7 +178,7 @@ def main():
     )
 
     # =========================================================================
-    # PASO 3: Conectar — Servidor aplica JSON recibido
+    # PASO 4: Conectar — Servidor aplica JSON recibido
     # =========================================================================
     # El servidor imprime: "Parámetros recibidos del cliente: {...}"
     # Configura picamera2 y empieza a enviar frames.

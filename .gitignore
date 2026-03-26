@@ -31,3 +31,11 @@ coverage.xml
 
 # Calibración de cámara (artefacto local, generado por calibrar_camara.py)
 *.npz
+
+# Configuración local del usuario (no compartir)
+config.json
+
+# Archivos generados por los scripts de ejemplo
+captura_cam.jpg
+video.mp4
+frames/

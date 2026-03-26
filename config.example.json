@@ -1,0 +1,54 @@
+{
+    "_comentario": "Copia este archivo como config.json y edita tus valores. Rangos en README.md",
+
+    "conexion": {
+        "host": "192.168.1.100",
+        "port": 5001
+    },
+
+    "camara": {
+        "width": 640,
+        "height": 480,
+        "rotation": 0,
+        "jpeg_quality": 85,
+        "brightness": 0.0,
+        "contrast": 1.0,
+        "saturation": 1.0,
+        "sharpness": 1.0,
+        "exposure_time": null,
+        "analogue_gain": null
+    },
+
+    "grabacion": {
+        "output": "video.mp4",
+        "duration": 30,
+        "fps": 15
+    },
+
+    "frames": {
+        "num_frames": 100,
+        "prefix": "frame",
+        "output_dir": "frames"
+    },
+
+    "deteccion_movimiento": {
+        "umbral" : 25,
+        "area_minima": 500
+    },
+
+    "detector_color": {
+        "color": "rojo"
+    },
+
+    "calibracion": {
+        "tablero_cols": 9,
+        "tablero_rows": 6,
+        "num_imagenes": 20,
+        "output_file": "calibracion.npz"
+    },
+
+    "distancia_visual": {
+        "ancho_real_cm": 10.0,
+        "color": "rojo"
+    }
+}
