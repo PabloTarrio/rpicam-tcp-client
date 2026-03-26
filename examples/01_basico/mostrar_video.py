@@ -10,6 +10,7 @@ OBJETIVO:
 REQUISITOS PREVIOS:
     - Servidor corriendo: `sudo systemctl status camara-tcp.service`
     - Conocer IP de la Raspberry Pi: `ping 172.16.127.78`
+    - (Opcional) Copiar config.example.json -> config.json y editar tu IP
 
 CONCEPTOS CLAVE:
     - Protocolo TCP: 4 bytes de tamaño + datos JPEG
@@ -30,8 +31,14 @@ DETENER: Pulsa `q` en la ventana para salir
 """
 
 import argparse
+import sys
+from pathlib import Path
 
 import cv2
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 from rpicam_tcp_client import CameraClient
 
@@ -41,53 +48,65 @@ def main():
     Función principal: conecta, recibe frames y los muestra hasta presionar 'q'.
 
     Flujo del programa:
-        1. Parsear argumentos (--host, --port)
-        2. Crear CameraClient con valores por defecto del servidor
-        3. Conectar con `with` (automático disconnect)
-        4. Bucle infinito: get_frame() → cv2.imshow() → waitKey()
-        5. Salir limpiamente al presionar 'q'
+        1. Cargar config.json (si existe)
+        2. Parsear argumentos (--host, --port)
+        3. Crear CameraClient con valores por defecto del servidor
+        4. Conectar con `with` (automático disconnect)
+        5. Bucle infinito: get_frame() → cv2.imshow() → waitKey()
+        6. Salir limpiamente al presionar 'q'
     """
-
     # =========================================================================
-    # PASO 1: Parsear argumentos de línea de comandos
+    # PASO 1: Cargar configuración desde config.json (si existe)
     # =========================================================================
-    # argparse permite usar --host y --port desde terminal.
-    # Valores por defecto aseguran que funcione sin parámetros extra.
-
+    # load_config() busca config.json en la raiz del proyecto
+    # Si no existe, devuelve {} y los argumentos de la linea de comandos
+    # o lo svalores por defecto del argparse se usarán
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    
+    # =========================================================================
+    # PASO 2: Parsear argumentos de línea de comandos
+    # =========================================================================
+    # Los argumentos de terminal SIEMPRE tiene prioridad sobre config.json
+    # Si no se pasa --host, se usa el valor del config.json o falla con error
     parser = argparse.ArgumentParser(
         description="Muestra vídeo desde la Raspberry Pi (valores por defecto)."
     )
-    parser.add_argument("--host", required=True, help="IP de la Raspberry Pi")
     parser.add_argument(
-        "--port", type=int, default=5001, help="Puerto TCP (por defecto 5001)"
+        "--host",
+        default=cfg_conexion.get("host"),
+        help="IP de la Raspberry Pi")
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=cfg_conexion.get("port", 5001),
+        help="Puerto TCP (por defecto 5001)",
     )
     args = parser.parse_args()
+
+    if args.host is None:
+        print("Error: indica --host o configura 'host' en config.json")
+        sys.exit(1)
 
     msg = f"Conectando a {args.host}:{args.port}. Valores por defecto del servidor."
     print(msg)
 
     # =========================================================================
-    # PASO 2: Crear CameraClient — Valores por defecto del servidor
+    # PASO 3: Crear CameraClient — Valores por defecto del servidor
     # =========================================================================
-    # Al NO pasar parámetros, CameraClient envía {} vacío al servidor.
-    # El servidor usa: 1920x1080, JPEG=80, controles neutros.
-
     cam = CameraClient(
         host=args.host,
         port=args.port,
         # No especificamos más parámetros -> servidor usa por defecto
     )
     # =========================================================================
-    # PASO 3: Conectar con Context Manager (automático disconnect)
+    # PASO 4: Conectar con Context Manager (automático disconnect)
     # =========================================================================
-    # `with` garantiza que cam.disconnect() se llame SIEMPRE,
-    # incluso si hay excepciones o el usuario cierra abruptamente.
-
     with cam:
         print("Recibiendo video. Pulsa 'q' para salir.")
 
         # =====================================================================
-        # PASO 4: Bucle infinito de streaming
+        # PASO 4.1: Bucle infinito de streaming
         # =====================================================================
         # while True continúa hasta que:
         # - Usuario pulse 'q' (cv2.waitKey detecta ord('q'))
@@ -95,7 +114,7 @@ def main():
 
         while True:
             # -----------------------------------------------------------------
-            # 4.1: Recibir frame del servidor
+            # 4.2: Recibir frame del servidor
             # -----------------------------------------------------------------
             # get_frame() lee el protocolo TCP:
             # 1. 4 bytes con tamaño del JPEG
@@ -109,7 +128,7 @@ def main():
                 break
 
             # -----------------------------------------------------------------
-            # 4.2: Mostrar frame en ventana
+            # 4.3: Mostrar frame en ventana
             # -----------------------------------------------------------------
             # cv2.imshow crea/mantiene ventana con nombre "Raspberry Pi Camera".
             # OpenCV maneja buffers y refresco automático.
@@ -117,7 +136,7 @@ def main():
             cv2.imshow("RaspberryPi CAM", frame)
 
             # -----------------------------------------------------------------
-            # 4.3: Esperar tecla (1ms timeout = no bloquea)
+            # 4.4: Esperar tecla (1ms timeout = no bloquea)
             # -----------------------------------------------------------------
             # cv2.waitKey(1) espera máximo 1ms por tecla.
             # & 0xFF elimina bits altos (cross-platform).
@@ -135,7 +154,6 @@ def main():
 
     cv2.destroyAllWindows()
     print("Ejemplo completado exitosamente.")
-
 
 # =============================================================================
 # EJERCICIOS PARA PRACTICAR:
