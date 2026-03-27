@@ -33,12 +33,17 @@ DETENER: Automático tras N frames. Ctrl+C para cancelar.
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 import cv2
 from tqdm import tqdm
 
 from rpicam_tcp_client import CameraClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 
 def main():
@@ -53,49 +58,66 @@ def main():
     4. Bucle for con tqdm: get_frame() -> guardar numerado
     5. Salida limpia automática
     """
+    # =========================================================================
+    # PASO 1: Cargar configuración desde config.json (si existe)
+    # =========================================================================
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    cfg_camara = cfg.get("camara", {})
+    cfg_frames = cfg.get("frames", {})
 
     # ================================================================
-    # PASO 1: argparse parámetros secuencia
+    # PASO 2: argparse parámetros secuencia
     # ================================================================
     parser = argparse.ArgumentParser(
         description="Captura secuencia numerada de frames (time-lapse/dataset)"
     )
 
-    parser.add_argument("--host", required=True, help="IP Raspberry Pi")
-    parser.add_argument("--port", type=int, default=5001, help="Puerto TCP")
+    parser.add_argument(
+        "--host",
+        default=cfg_conexion.get("host"),
+        help="IP Raspberry Pi",
+    )
+    parser.add_argument(
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
+    )
     parser.add_argument(
         "--frames",
         "-n",
         type=int,
-        default=100,
+        default=cfg_frames.get("frames", 100),
         help="Número de frames a capturar (default 100)",
     )
     parser.add_argument(
         "--prefix",
         "-p",
-        default="frame",
+        default=cfg_frames.get("prefix", "frame"),
         help="Prefijo de los archivos generados (default 'frame')",
     )
     parser.add_argument(
         "--output-dir",
         "-o",
-        default="frames",
+        default=cfg_frames.get("output_dir", "frames"),
         help="Carpeta de destino (default 'frames')",
     )
     parser.add_argument(
-        "--width", type=int, default=640, help="Ancho del frame (default 640)"
+        "--width", type=int, default=cfg_camara.get("width", 640), help="Ancho frame"
     )
     parser.add_argument(
-        "--height", type=int, default=480, help="Alto del frame (default 480)"
+        "--height", type=int, default=cfg_camara.get("height", 480), help="Alto frame"
     )
     parser.add_argument(
         "--rotation",
         type=int,
-        default=0,
+        default=cfg_camara.get("rotation", 0),
         choices=[0, 90, 180, 270],
-        help="Rotación grados (default 0)",
+        help="Grados de Rotación",
     )
     args = parser.parse_args()
+
+    if args.host is None:
+        print("Error: indica --host o configura 'host' en config.json")
+        sys.exit(1)
 
     # ================================================================
     # PASO 2: validar/crear directorio de salida

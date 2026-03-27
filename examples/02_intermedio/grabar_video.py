@@ -34,12 +34,18 @@ DETENER:
 """
 
 import argparse
+import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
 import cv2
 
 from rpicam_tcp_client import CameraClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 
 def main():
@@ -55,44 +61,76 @@ def main():
     5. Bucle grabación: frame -> timestamp -> write()
     6. Liberar writer y salir limpio
     """
+    # =========================================================================
+    # PASO 1: Cargar configuración desde config.json (si existe)
+    # =========================================================================
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    cfg_camara = cfg.get("camara", {})
+    cfg_grabacion = cfg.get("grabacion", {})
+
     # ===============================================================
-    # PASO 1: argparse parámetros grabación
+    # PASO 2: argparse parámetros grabación
     # ===============================================================
     parser = argparse.ArgumentParser(
         description="Graba video MP4 desde Raspberry Pi Camera."
     )
 
-    parser.add_argument("--host", required=True, help="IP Raspberry Pi")
-    parser.add_argument("--port", type=int, default=5001, help="Puerto TCP")
     parser.add_argument(
-        "--output", "-o", default="video.mp4", help="Archivo MP4 destino"
+        "--host",
+        default=cfg_conexion.get("host"),
+        help="IP Raspberry Pi",
     )
     parser.add_argument(
-        "--duration", "-d", type=int, default=30, help="Duración segundos (default 30)"
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
     )
     parser.add_argument(
-        "--fps", type=int, default=15, help="FPS grabación (default 15)"
+        "--output",
+        "-o",
+        default=cfg_grabacion.get("output", "video.mp4"),
+        help="Archivo MP4 destino",
     )
-    parser.add_argument("--width", type=int, default=640, help="Ancho frame")
-    parser.add_argument("--height", type=int, default=480, help="Alto frame")
+    parser.add_argument(
+        "--duration",
+        "-d",
+        type=int,
+        default=cfg_grabacion.get("duration", 30),
+        help="Duración segundos (default 30)",
+    )
+    parser.add_argument(
+        "--fps",
+        type=int,
+        default=cfg_grabacion.get("fps", 15),
+        help="FPS grabación (default 15)",
+    )
+    parser.add_argument(
+        "--width", type=int, default=cfg_camara.get("width", 640), help="Ancho frame"
+    )
+    parser.add_argument(
+        "--height", type=int, default=cfg_camara.get("height", 480), help="Alto frame"
+    )
     parser.add_argument(
         "--rotation",
         type=int,
-        default=0,
+        default=cfg_camara.get("rotation", 0),
         choices=[0, 90, 180, 270],
         help="Grados de Rotación",
     )
     args = parser.parse_args()
 
+    if args.host is None:
+        print("Error: indica --host o configura 'host' en config.json")
+        sys.exit(1)
+
     # ===============================================================
-    # PASO 2: calcular los frames totales
+    # PASO 3: calcular los frames totales
     # ===============================================================
     frames_total = args.duration * args.fps
     print(f"Grabando {args.duration}s a {args.fps}FPS = {frames_total} frames")
     print(f"Output: {args.output} ({args.width}x{args.height})")
 
     # ===============================================================
-    # PASO 3: Videowriter H.264
+    # PASO 4: Videowriter H.264
     # ===============================================================
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # Codec H.264
     out = cv2.VideoWriter(
@@ -103,7 +141,7 @@ def main():
     )
 
     # ===============================================================
-    # PASO 4: Conectar Camara
+    # PASO 5: Conectar Camara
     # ===============================================================
     cam = CameraClient(
         host=args.host,
@@ -129,7 +167,6 @@ def main():
             if frame is None:
                 print("Conexión perdida")
                 break
-
             # ===============================================================
             # PASO 6: Añadir TIMESTAMP
             # ===============================================================
