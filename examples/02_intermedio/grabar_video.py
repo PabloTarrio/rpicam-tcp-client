@@ -80,43 +80,35 @@ def main():
         "--host",
         default=cfg_conexion.get("host"),
         help="IP Raspberry Pi",
-        )
+    )
     parser.add_argument(
-        "--port",
-        type=int,
-        default=cfg_conexion.get("port", 5001),
-        help="Puerto TCP"
-        )
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
+    )
     parser.add_argument(
         "--output",
         "-o",
         default=cfg_grabacion.get("output", "video.mp4"),
-        help="Archivo MP4 destino"
-        )
+        help="Archivo MP4 destino",
+    )
     parser.add_argument(
         "--duration",
         "-d",
         type=int,
         default=cfg_grabacion.get("duration", 30),
-        help="Duración segundos (default 30)"
-        )
+        help="Duración segundos (default 30)",
+    )
     parser.add_argument(
         "--fps",
         type=int,
         default=cfg_grabacion.get("fps", 15),
-        help="FPS grabación (default 15)"
-        )
+        help="FPS grabación (default 15)",
+    )
     parser.add_argument(
-        "--width",
-        type=int,
-        default=cfg_camara.get("width", 640),
-        help="Ancho frame")
+        "--width", type=int, default=cfg_camara.get("width", 640), help="Ancho frame"
+    )
     parser.add_argument(
-        "--height",
-        type=int,
-        default=cfg_camara.get("height", 480),
-        help="Alto frame"
-        )
+        "--height", type=int, default=cfg_camara.get("height", 480), help="Alto frame"
+    )
     parser.add_argument(
         "--rotation",
         type=int,

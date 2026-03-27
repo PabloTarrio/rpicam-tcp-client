@@ -64,7 +64,6 @@ def main():
     cfg = load_config()
     cfg_conexion = cfg.get("conexion", {})
     cfg_camara = cfg.get("camara", {})
-    cfg_grabacion = cfg.get("grabacion", {})
     cfg_frames = cfg.get("frames", {})
 
     # ================================================================
@@ -78,13 +77,10 @@ def main():
         "--host",
         default=cfg_conexion.get("host"),
         help="IP Raspberry Pi",
-        )
+    )
     parser.add_argument(
-        "--port",
-        type=int,
-        default=cfg_conexion.get("port", 5001),
-        help="Puerto TCP"
-        )    
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
+    )
     parser.add_argument(
         "--frames",
         "-n",
@@ -105,16 +101,11 @@ def main():
         help="Carpeta de destino (default 'frames')",
     )
     parser.add_argument(
-        "--width",
-        type=int,
-        default=cfg_camara.get("width", 640),
-        help="Ancho frame")
+        "--width", type=int, default=cfg_camara.get("width", 640), help="Ancho frame"
+    )
     parser.add_argument(
-        "--height",
-        type=int,
-        default=cfg_camara.get("height", 480),
-        help="Alto frame"
-        )
+        "--height", type=int, default=cfg_camara.get("height", 480), help="Alto frame"
+    )
     parser.add_argument(
         "--rotation",
         type=int,
