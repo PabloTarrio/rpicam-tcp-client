@@ -29,11 +29,17 @@ DETENER: Pulsa 'q' en la ventana para salir.
 """
 
 import argparse
+import sys
+from pathlib import Path
 
 import cv2
 import numpy as np
 
 from rpicam_tcp_client import CameraClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 
 def main():
@@ -54,61 +60,66 @@ def main():
         6. Salir con 'q' y cerrar ventana limpiamente
     """
     # =========================================================================
-    # PASO 1. Parsear argumentos de linea de comandos
+    # PASO 1: Cargar configuración desde config.json (si existe)
+    # =========================================================================
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    cfg_camara = cfg.get("camara", {})
+    cfg_calibracion = cfg.get("calibracion", {})
+    cfg_distancia_visual = cfg.get("distancia_visual", {})
+
+    # =========================================================================
+    # PASO 2. Parsear argumentos de linea de comandos
     # =========================================================================
     parser = argparse.ArgumentParser(
         description="Mide la distancia a un objeto usando la cámara calibrada"
     )
     parser.add_argument(
         "--host",
-        required=True,
-        help="IP de la Raspberry PI",
+        default=cfg_conexion.get("host"),
+        help="IP Raspberry Pi",
     )
     parser.add_argument(
-        "--port",
-        type=int,
-        default=5001,
-        help="Puerto TCP (por defecto: 5001)",
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
     )
     parser.add_argument(
-        "--width",
-        type=int,
-        default=640,
-        help="Ancho del frame en el cliente (por defecto: 640)",
+        "--width", type=int, default=cfg_camara.get("width", 640), help="Ancho frame"
     )
     parser.add_argument(
-        "--height",
-        type=int,
-        default=480,
-        help="Alto del frame en el cliente (por defecto: 480)",
+        "--height", type=int, default=cfg_camara.get("height", 480), help="Alto frame"
     )
     parser.add_argument(
         "--color",
-        default="rojo",
+        default=cfg_distancia_visual.get("color", "rojo"),
         choices=["rojo", "azul", "verde", "amarillo"],
         help="Color del objeto a detectar (por defecto: rojo)",
     )
     parser.add_argument(
-        "--ancho-real",
+        "--ancho_real_cm",
         type=float,
-        required=True,
+        default=cfg_distancia_visual.get("ancho_real_cm", 10.0),
         help="Ancho real del objeto en cm (obligatorio)",
     )
     parser.add_argument(
         "--calibracion",
-        default="calibracion.npz",
+        default=cfg_calibracion.get("output_file", "calibracion.npz"),
         help="Ruta al archivo de calibración (por defecto: calibracion.npz)",
     )
     parser.add_argument(
         "--rotation",
         type=int,
-        default=180,
+        default=cfg_camara.get("rotation", 180),
         choices=[0, 90, 180, 270],
         help="Rotación del frame en el cliente (por defecto: 0)",
     )
     args = parser.parse_args()
+
+    if args.host is None:
+        print("Error: indica --host o configura 'host' en config.json")
+        sys.exit(1)
+
     # =========================================================================
-    # PASO 2. Cargar matriz intrínseca K desde el archivo .npz
+    # PASO 3. Cargar matriz intrínseca K desde el archivo .npz
     # El archivo fué generado por calibrar_camara.py y contiene
     # la matriz K y los coeficientes de distorsión de la cámara
     # =========================================================================
@@ -122,7 +133,7 @@ def main():
         return
 
     # =========================================================================
-    # PASO 3. Extraer distancia focal f de la matriz K
+    # PASO 4. Extraer distancia focal f de la matriz K
     # La matriz K tiene esta forma:
     #       [[fx, 0, cx],
     #         [0,fy, cy],
@@ -135,7 +146,7 @@ def main():
     print(f"Distancia focal f(x): {focal:.2f} píxeles")
 
     # =========================================================================
-    # PASO 4. Definir los rangos HSV para el color seleccionado
+    # PASO 5. Definir los rangos HSV para el color seleccionado
     # Reutilizamos los mismos rangos que en detector_color.py
     # =========================================================================
     rangos_hsv = {
@@ -147,7 +158,7 @@ def main():
     limite_inferior, limite_superior = rangos_hsv[args.color]
 
     # =========================================================================
-    # PASO 5. Crear CameraClient y conectar con la Raspberry Pi
+    # PASO 6. Crear CameraClient y conectar con la Raspberry Pi
     # =========================================================================
     with CameraClient(
         host=args.host,
@@ -157,7 +168,7 @@ def main():
         rotation=args.rotation,
     ) as cam:
         print(f"Conectado a la cámara en {args.host}:{args.port}")
-        print(f"Detectando color: {args.color} | Ancho real: {args.ancho_real} cm")
+        print(f"Detectando color: {args.color} | Ancho real: {args.ancho_real_cm} cm")
         print("Pulsa 'q' para salir")
 
         cv2.namedWindow("Medición de distancia", cv2.WINDOW_NORMAL)
@@ -170,7 +181,7 @@ def main():
                     break
 
                 # =========================================================
-                # PASO 5.1. Convertir BGR -> HSV y crear máscara
+                # PASO 7.1. Convertir BGR -> HSV y crear máscara
                 # Mismo procedimiento que en detector_color.py
                 # =========================================================
                 hsv = cv2.cvtColor(src=frame, code=cv2.COLOR_BGR2HSV)
@@ -181,7 +192,7 @@ def main():
                 )
 
                 # =========================================================
-                # PASO 5.2. Encontrar contornos en la máscara
+                # PASO 7.2. Encontrar contornos en la máscara
                 # findContours devuelve la lista de contornos.
                 # Nos quedamos con el más grande (mayor área),
                 # que corresponde con el objeto principal detectado.
@@ -196,23 +207,23 @@ def main():
                     contorno_mayor = max(contornos, key=cv2.contourArea)
 
                     # =====================================================
-                    # PASO 5.3. Medir ancho en píxeles con boundingRect
+                    # PASO 7.3. Medir ancho en píxeles con boundingRect
                     # boundingRect devuelve (x, y, ancho, alto) del
                     # rectángulo que envuelve el contorno detectado
                     # =====================================================
                     x, y, ancho_px, alto_px = cv2.boundingRect(contorno_mayor)
 
                     # =====================================================
-                    # PASO 5.4. Calcular la distancia D = (W * f) / P
-                    #   W = Ancho real en cm (args.ancho_real)
+                    # PASO 7.4. Calcular la distancia D = (W * f) / P
+                    #   W = Ancho real en cm (args.ancho_real_cm)
                     #   f = Distancia focal en pixeles (focal)
                     #   P = Ancho del objeto en píxeles (ancho_px)
                     # =====================================================
                     if ancho_px > 0:
-                        distancia = (args.ancho_real * focal) / ancho_px
+                        distancia = (args.ancho_real_cm * focal) / ancho_px
 
                         # =================================================
-                        # PASO 5.5. Dibujar rectángulo y distancia
+                        # PASO 7.5. Dibujar rectángulo y distancia
                         # Rectángulo verde alrededor del objeto y texto
                         #   con la distancia estimada en cm.
                         # =================================================
@@ -243,7 +254,7 @@ def main():
 
         finally:
             # =================================================================
-            # PASO 6. Cerrar ventanas al salir
+            # PASO 8. Cerrar ventanas al salir
             # =================================================================
             cv2.destroyAllWindows()
 
