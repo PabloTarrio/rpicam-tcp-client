@@ -17,6 +17,8 @@ mediante TCP.
 - **Escalado y rotación locales** — `cv2.resize` y `cv2.rotate` en el cliente
 - **Reconexión automática** — reintentos configurables si falla la conexión
 - **Plug & play** — API simple con context managers
+- **Configuración global** — `config.json` centraliza host, resolución y parámetros de cada ejemplo
+- **Tests** - 98% pytest con mocks (sin RPI real)
 
 ---
 
@@ -49,15 +51,27 @@ cd server && pip install -r requirements.txt
 sudo cp camara-tcp.service /etc/systemd/system/
 sudo systemctl enable --now camara-tcp.service
 ```
-**Características:**
 
-* Acceso remoto: conecta desde cualquier PC de la red.
+## Primeros pasos
 
-* Parámetros configurables: brillo, contraste, saturación, etc.
+Los ejemplos pueden ejecutarse directamente con `--host`, pero tambien admiten un archivo de configuración global para evitar repetir parámetro en cada comando.
 
-* Escalado/rotación locales: `cv2.resize()`, `cv2.rotate()` en cliente
+```bash
+# Copiar plantilla de configuración
+cp config.example.json config.json
 
-* Tests 98%: pytest con mocks (sin RPi real)
+# Editar con la IP de la raspberry PI y preferencias
+nano config.json
+```
+
+Con `config.json` configurado  los ejemplos no necesitan `--host` ni otros parámetros:
+
+```bash
+python examples/01_basico/mostrar_video.py
+```
+
+> **Nota:** `config.json` está en `.gitignore` para no subir datos personales al repositorio.
+
 
 ## Uso Básico
 
@@ -139,6 +153,7 @@ rpicam-tcp-client/
 |    |___ servidor_camara_tcp.py
 |    |___ README.md
 |___ examples/
+|    |___config_loader.py
 |    |___01_basico/
 |    |    |___ guardar_frame.py
 |    |    |___ mostrar_video.py
@@ -153,6 +168,7 @@ rpicam-tcp-client/
 |    |    |___ medir_distancia_visual.py
 |    |___ images/
 |    |___ README.md
+|___ config.example.json
 |___ tests/
 |    |___test_smoke.py
 |    |___test_camera_client.py
