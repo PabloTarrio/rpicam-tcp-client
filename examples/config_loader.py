@@ -13,6 +13,9 @@ Uso en cualquier script de examples/:
 import json
 from pathlib import Path
 
+# Variable de módulo: permite hacer patch en los tests
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.json"
+
 
 def load_config() -> dict:
     """
@@ -20,13 +23,13 @@ def load_config() -> dict:
 
     Returns:
         dict: Contenido del archivo de configuración,
-            o diccionario vacío si no existe
+            o diccionario vacío si no existe o tiene JSON inválido.
     """
-    raiz = Path(__file__).resolve().parent.parent
-    config_path = raiz / "config.json"
-
-    if not config_path.exists():
+    if not CONFIG_PATH.exists():
         return {}
 
-    with open(config_path, encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(CONFIG_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return {}
