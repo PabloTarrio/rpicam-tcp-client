@@ -34,10 +34,16 @@ DETENER:
 """
 
 import argparse
+import sys
+from pathlib import Path
 
 import cv2
 
 from rpicam_tcp_client import CameraClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 
 def main():
@@ -52,45 +58,69 @@ def main():
     4. Bucle: frame -> mascara -> contornos -> dibujar -> mostrar
     5. Salir limpiamente con 'q'
     """
+    # =========================================================================
+    # PASO 1: Cargar configuración desde config.json (si existe)
+    # =========================================================================
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    cfg_camara = cfg.get("camara", {})
+    cfg_deteccion_movimiento = cfg.get("deteccion_movimiento", {})
 
     # ===============================================================
-    # PASO 1: argparse parámetro detección
+    # PASO 2: argparse parámetro detección
     # ===============================================================
     parser = argparse.ArgumentParser(
         description="Detecta movimiento en tiempo real desde RPi Camera"
     )
-
-    parser.add_argument("--host", required=True, help="IP Raspberry Pi")
-    parser.add_argument("--port", type=int, default=5001, help="Puerto TCP")
+    parser.add_argument(
+        "--host",
+        default=cfg_conexion.get("host"),
+        help="IP Raspberry Pi",
+        )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=cfg_conexion.get("port", 5001),
+        help="Puerto TCP"
+        )   
     parser.add_argument(
         "--area_minima",
         type=int,
-        default=500,
+        default=cfg_deteccion_movimiento.get("area_minima", 500),
         help="Area mínima px2 para considerar movimiento (default 500)",
     )
     parser.add_argument(
         "--umbral",
         type=int,
-        default=25,
+        default=cfg_deteccion_movimiento.get("umbral", 25),
         help="Sensibilidad detección 1-100, menor= mas sensible (default 25)",
     )
     parser.add_argument(
-        "--width", type=int, default=640, help="Ancho del frame (default 640)"
-    )
+        "--width",
+        type=int,
+        default=cfg_camara.get("width", 640),
+        help="Ancho frame")
     parser.add_argument(
-        "--height", type=int, default=480, help="Alto del frame (default 480)"
-    )
+        "--height",
+        type=int,
+        default=cfg_camara.get("height", 480),
+        help="Alto frame"
+        )
     parser.add_argument(
         "--rotation",
         type=int,
-        default=0,
+        default=cfg_camara.get("rotation", 0),
         choices=[0, 90, 180, 270],
-        help="Rotación grados (default 0)",
+        help="Grados de Rotación",
     )
     args = parser.parse_args()
 
+    if args.host is None:
+        print("Error: indica --host o configura 'host' en config.json")
+        sys.exit(1)
+
     # ===============================================================
-    # PASO 2: crear BackgroundSubtractor
+    # PASO 3: crear BackgroundSubtractor
     # ===============================================================
     subtractor = cv2.createBackgroundSubtractorMOG2(
         history=500,
@@ -99,7 +129,7 @@ def main():
     )
 
     # ===============================================================
-    # PASO 3: conectar cámara
+    # PASO 4: conectar cámara
     # ===============================================================
     cam = CameraClient(
         host=args.host,
@@ -122,20 +152,20 @@ def main():
                 break
 
             # ===============================================================
-            # PASO 4: Aplicar BackgroundSubtractor
+            # PASO 5: Aplicar BackgroundSubtractor
             # Devuelve mascara: blanco=movimiento, negro=fondo
             # ===============================================================
             mascara = subtractor.apply(frame)
 
             # ===============================================================
-            # PASO 5: Encontrar contornos en la mascara
+            # PASO 6: Encontrar contornos en la mascara
             # ===============================================================
             contornos, _ = cv2.findContours(
                 image=mascara, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE
             )
 
             # ===============================================================
-            # PASO 6: Filtrar contornos por area mínima y dibujar
+            # PASO 7: Filtrar contornos por area mínima y dibujar
             # ===============================================================
             movimiento_detectado = False
             for contorno in contornos:
@@ -155,7 +185,7 @@ def main():
                 movimiento_detectado = True
 
             # ===============================================================
-            # PASO 7: Mostrar alerta visual si hay movimiento
+            # PASO 8: Mostrar alerta visual si hay movimiento
             # ===============================================================
             if movimiento_detectado:
                 cv2.putText(
@@ -179,7 +209,7 @@ def main():
                 )
 
             # ===============================================================
-            # PASO 8: Mostrar frame y mascara
+            # PASO 9: Mostrar frame y mascara
             # ===============================================================
             cv2.imshow("Cámara", frame)
             cv2.imshow("Máscara", mascara)
