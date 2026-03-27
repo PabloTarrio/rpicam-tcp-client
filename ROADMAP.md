@@ -97,15 +97,14 @@
 - [x] Documentar en `README.md` problema conocido de fuente Qt con opencv-python
       y su solución (`cp dejavi fonts -> .venv/cv2/qt/fonts/`)
 
-## Pendiente
-
 ### Fase 8 - Publicacion en PyPI (v1.0.0)
-- [ ] Revisar y completar metadatos en `pyproject.toml`
-- [ ] Generar el paquete con `build`
-- [ ] Publicar en TestPyPI y verificar instalación
-- [ ] Publicar en PyPI oficial
-- [ ] Actualizar `README.md` con badge e instrucciones `pip install`
+- [x] Revisar y completar metadatos en `pyproject.toml`
+- [x] Generar el paquete con `build`
+- [x] Publicar en TestPyPI y verificar instalación
+- [x] Publicar en PyPI oficial
+- [x] Actualizar `README.md` con badge e instrucciones `pip install`
 
+## Pendiente
 
 ### IDEAS FUTURAS
 - [ ] Grabación activada por detección de movimiento (tipo cámara de seguridad)
