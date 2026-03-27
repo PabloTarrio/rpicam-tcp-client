@@ -28,11 +28,17 @@ DETENER: Pulsa 'q' para salida, 'c' para capturar una imagen de calibración
 """
 
 import argparse
+import sys
+from pathlib import Path
 
 import cv2
 import numpy as np
 
 from rpicam_tcp_client import CameraClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 
 def main():
@@ -51,66 +57,75 @@ def main():
         5.Calcular calibración con cv2.calibrateCamera()
         6.Guardar resultados en archivo .npz
     """
+    # =========================================================================
+    # PASO 1: Cargar configuración desde config.json (si existe)
+    # =========================================================================
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    cfg_camara = cfg.get("camara", {})
+    cfg_calibracion = cfg.get("calibracion", {})
+
     # ===============================================================
-    # PASO 1 - Parsear argumentos de la linea de comandos
+    # PASO 2 - Parsear argumentos de la linea de comandos
     # ===============================================================
     parser = argparse.ArgumentParser(
         description="Calibra la cámara usando un tablero de ajedrez"
     )
     parser.add_argument(
         "--host",
-        required=True,
-        help="IP de la Raspberry Pi",
+        default=cfg_conexion.get("host"),
+        help="IP Raspberry Pi",
     )
     parser.add_argument(
-        "--port", type=int, default=5001, help="Puerto TCP(por defecto: 5001)"
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
     )
     parser.add_argument(
-        "--width",
+        "--width", type=int, default=cfg_camara.get("width", 640), help="Ancho frame"
+    )
+    parser.add_argument(
+        "--height", type=int, default=cfg_camara.get("height", 480), help="Alto frame"
+    )
+    parser.add_argument(
+        "--tablero_cols",
         type=int,
-        default=640,
-        help="Ancho del frame (por defecto: 640)",
-    )
-    parser.add_argument(
-        "--height", type=int, default=480, help="Alto del frame (por defecto: 480)"
-    )
-    parser.add_argument(
-        "--esquinas-x",
-        type=int,
-        default=9,
+        default=cfg_calibracion.get("tablero_cols", 9),
         help="Numero de esquinas interiores horizontales (por defecto: 9)",
     )
     parser.add_argument(
-        "--esquinas-y",
+        "--tablero_rows",
         type=int,
-        default=6,
+        default=cfg_calibracion.get("tablero_rows", 6),
         help="Número de esquinas interiores verticales (por defecto: 6)",
     )
     parser.add_argument(
-        "--capturas",
+        "--num_imagenes",
         type=int,
-        default=20,
+        default=cfg_calibracion.get("num_imagenes", 20),
         help="Numero de capturas necesarias para calibrar (por defecto: 20)",
     )
     parser.add_argument(
-        "--salida",
-        default="calib_camara.npz",
+        "--output_file",
+        default=cfg_calibracion.get("output_file", "calibracion.npz"),
         help="Archivo de salida con los parámetrospor defecto: 'calib_camara.npz'",
     )
     args = parser.parse_args()
 
+    if args.host is None:
+        print("Error: indica --host o configura 'host' en config.json")
+        sys.exit(1)
+
     # ===============================================================
-    # PASO 2 - Preparar puntos 3D del tablero de ajedrez
+    # PASO 3 - Preparar puntos 3D del tablero de ajedrez
     # Los puntos 3D representan las esquinas del tablero en el mundo
     # real, asumiendo que el tablero está en el plano Z=0.
     # Cada esquina tiene coordenadas (x, y, 0), donde x e y son
     # números enteros que representan la posición en el tablero.
     # ===============================================================
     puntos_3d_tablero = np.zeros(
-        (args.esquinas_x * args.esquinas_y, 3), dtype=np.float32
+        (args.tablero_cols * args.tablero_rows, 3), dtype=np.float32
     )
     puntos_3d_tablero[:, :2] = np.mgrid[
-        0 : args.esquinas_x, 0 : args.esquinas_y
+        0 : args.tablero_cols, 0 : args.tablero_rows
     ].T.reshape(-1, 2)
 
     # Listas donde acumularemos los puntos de cada captura válida
@@ -119,7 +134,7 @@ def main():
     #     captura)
 
     # ===============================================================
-    # PASO 3 - Crear Camera Client y conectar con la Raspberry Pi
+    # PASO 4 - Crear Camera Client y conectar con la Raspberry Pi
     # Usamos resolución reducida (640x480) para mayor velocidad de
     # procesamiento. La calibración será válida para esta resolución.
     # ===============================================================
@@ -130,7 +145,7 @@ def main():
         height=args.height,
     ) as cam:
         print(f"Conectado a la cámara en {args.host}:{args.port}")
-        print(f"Capturas necesarias: {args.capturas}")
+        print(f"Capturas necesarias: {args.num_imagenes}")
         print("Pulsa 'c' para capturar - 'q' para salir.")
 
         cv2.namedWindow("Calibración", cv2.WINDOW_NORMAL)
@@ -142,23 +157,23 @@ def main():
                     print("Conexión perdida")
                     break
                 # =========================================================
-                # PASO 4.1 - Convertir a escala de grises
+                # PASO 5.1 - Convertir a escala de grises
                 # findChessboardCorners trabaja sobre imagen en grises,
                 # no necesita información de colores para detectar esquinas
                 # =========================================================
                 gris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 # =========================================================
-                # PASO 4.2 - Detectar esquinas del tablero de ajedrez
+                # PASO 5.2 - Detectar esquinas del tablero de ajedrez
                 # Devuelve (encontrado, esquinas): encontrado es True/False
                 # y esquinas es un array con las coordenadas 2D detectadas
                 # =========================================================
                 encontrado, esquinas = cv2.findChessboardCorners(
                     image=gris,
-                    patternSize=(args.esquinas_x, args.esquinas_y),
+                    patternSize=(args.tablero_cols, args.tablero_rows),
                     corners=None,
                 )
                 # =========================================================
-                # PASO 4.3 - Si se detectan esquinas, dibujarlas en verde
+                # PASO 5.3 - Si se detectan esquinas, dibujarlas en verde
                 # drawChessboardCorners dibuja las esquinas sobre el frame
                 # para que el usuario vea si el tablero está bien enfocado
                 # =========================================================
@@ -166,14 +181,14 @@ def main():
                 if encontrado:
                     cv2.drawChessboardCorners(
                         image=frame_viz,
-                        patternSize=(args.esquinas_x, args.esquinas_y),
+                        patternSize=(args.tablero_cols, args.tablero_rows),
                         corners=esquinas,
                         patternWasFound=encontrado,
                     )
                 # Mostrar contador de capturas acumuladas
                 cv2.putText(
                     img=frame_viz,
-                    text=f"Capturas: {len(lista_puntos_2d)}/{args.capturas}",
+                    text=f"Capturas: {len(lista_puntos_2d)}/{args.num_imagenes}",
                     org=(10, 30),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8,
@@ -183,7 +198,7 @@ def main():
                 cv2.imshow("Calibración", frame_viz)
 
                 # =========================================================
-                # PASO 4.4 - Capturar al pulsar 'c' si el tablero es visible
+                # PASO 5.4 - Capturar al pulsar 'c' si el tablero es visible
                 # =========================================================
                 tecla = cv2.waitKey(1) & 0xFF
                 if tecla == ord("c") and encontrado:
@@ -201,9 +216,10 @@ def main():
                     )
                     lista_puntos_3d.append(puntos_3d_tablero)
                     lista_puntos_2d.append(esquinas_refinadas)
-                    print(f"Captura {len(lista_puntos_2d)}/{args.capturas} registrada.")
+                    num_captura = len(lista_puntos_2d)
+                    print(f"Captura {num_captura}/{args.num_imagenes} registrada.")
 
-                    if len(lista_puntos_2d) >= args.capturas:
+                    if len(lista_puntos_2d) >= args.num_imagenes:
                         print("Capturas completadas. Calculando calibración...")
                         break
 
@@ -215,12 +231,12 @@ def main():
 
         finally:
             # =========================================================
-            # PASO 5 - Cerrar ventana
+            # PASO 6 - Cerrar ventana
             # =========================================================
             cv2.destroyAllWindows()
 
     # =================================================================
-    # PASO 6 - Calcular calibración y guardar resultados
+    # PASO 7 - Calcular calibración y guardar resultados
     # Solo calculamos si se acumularon suficientes capturas válidas
     # calibrateCamera deveulve matriz intrínseca K y los
     # coeficientes de distorsión, además del error de reproyección
@@ -239,17 +255,17 @@ def main():
     )
 
     # =================================================================
-    # PASO 7 - Guardar resultados en archivo .npz
+    # PASO 8 - Guardar resultados en archivo .npz
     # El archivo .npz permite cargar la calibración en otros scripts
     # (como medir_distancia_visual.py) sin repetir el proceso
     # =================================================================
     np.savez(
-        file=args.salida,
+        file=args.output_file,
         matriz_k=matriz_k,
         coef_distorsion=coef_distorsion,
     )
 
-    print(f"Calibración guardada en: {args.salida}")
+    print(f"Calibración guardada en: {args.output_file}")
     # Matriz de reproyección: Distancia media en píxeles entre las esquinas
     #   reales detectadas y las esquinas que el modelos calibrado predice.
     #   si error < 1.0 se considera calibración de buena calidad.

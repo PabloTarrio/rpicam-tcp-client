@@ -29,11 +29,17 @@ DETENER: Pulsa 'q' en la ventana para salir.
 """
 
 import argparse
+import sys
+from pathlib import Path
 
 import cv2
 import numpy as np
 
 from rpicam_tcp_client import CameraClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from config_loader import load_config
 
 
 def main():
@@ -52,59 +58,61 @@ def main():
             - Mostrar resultados con cv2.imshow
         5. Salir con 'q' y cerrar ventana limpiamente.
     """
+    # =========================================================================
+    # PASO 1: Cargar configuración desde config.json (si existe)
+    # =========================================================================
+    cfg = load_config()
+    cfg_conexion = cfg.get("conexion", {})
+    cfg_camara = cfg.get("camara", {})
+    cfg_detector_color = cfg.get("detector_color", {})
 
     # ===============================================================
-    # PASO 1: Parsear argumentos de la linea de comandos
+    # PASO 2: Parsear argumentos de la linea de comandos
     # ===============================================================
     parser = argparse.ArgumentParser(
         description="Detecta y rastrea objetos por color en tiempo real."
     )
     parser.add_argument(
         "--host",
-        required=True,
-        help="IP de la Raspberry PI",
+        default=cfg_conexion.get("host"),
+        help="IP Raspberry Pi",
     )
     parser.add_argument(
-        "--port",
-        type=int,
-        default=5001,
-        help="Puerto TCP (por defecto: 5001)",
+        "--port", type=int, default=cfg_conexion.get("port", 5001), help="Puerto TCP"
     )
     parser.add_argument(
         "--color",
-        default="rojo",
+        default=cfg_detector_color.get("color", "rojo"),
         choices=["rojo", "verde", "azul", "amarillo"],
         help="Color a detectar (por defecto: rojo)",
     )
     parser.add_argument(
-        "--width",
-        type=int,
-        default=640,
-        help="Ancho del frame en el cliente (por defecto: 640)",
+        "--width", type=int, default=cfg_camara.get("width", 640), help="Ancho frame"
     )
     parser.add_argument(
-        "--height",
-        type=int,
-        default=480,
-        help="Alto del frame en el cliente (por defecto: 480)",
+        "--height", type=int, default=cfg_camara.get("height", 480), help="Alto frame"
     )
     parser.add_argument(
         "--rotation",
         type=int,
-        default=180,
+        default=cfg_camara.get("rotation", 0),
         choices=[0, 90, 180, 270],
-        help="Rotación de la imagen [0, 90, 180, 270] (por defecto 180)",
+        help="Grados de Rotación",
     )
     parser.add_argument(
         "--saturation",
         type=float,
-        default=0.6,
+        default=cfg_camara.get("saturation", 0.6),
         help="Saturación de la imagen (por defecto 0.6)",
     )
     args = parser.parse_args()
 
+    if args.host is None:
+        print("Error: indica --host o configura 'host' en config.json")
+        sys.exit(1)
+
     # ===============================================================
-    # PASO 2: Definir rangos HSV para el color seleccionado
+    # PASO 3: Definir rangos HSV para el color seleccionado
     #   Cada color se define con dos arrays numpy: limite inferior y superior
     #   en el espacio HSV (Hue 0-179, Saturation 0-255, Value 0,255)
     # ===============================================================
@@ -118,7 +126,7 @@ def main():
     limite_inferior, limite_superior = rangos_hsv[args.color]
 
     # ===============================================================
-    # PASO 3: Crear CameraClient y conectar con Raspberry Pi.
+    # PASO 4: Crear CameraClient y conectar con Raspberry Pi.
     # ===============================================================
     with CameraClient(
         host=args.host,
@@ -132,7 +140,7 @@ def main():
         print(f"Detectando color: {args.color}. Pulsa 'q' para salir.")
 
         # ===============================================================
-        # PASO 4: Bucle principal de captura y detección
+        # PASO 5: Bucle principal de captura y detección
         # ===============================================================
         cv2.namedWindow("Detector de color", cv2.WINDOW_NORMAL)
         cv2.namedWindow("Máscara", cv2.WINDOW_NORMAL)
@@ -142,12 +150,12 @@ def main():
                 if frame is None:
                     print("Conexión perdida")
                     break
-                # 4.1 Convertir BGR -> HSV
+                # 5.1 Convertir BGR -> HSV
                 hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-                # 4.2 Crear máscara binaria con cv2.inRange()
+                # 5.2 Crear máscara binaria con cv2.inRange()
                 mascara = cv2.inRange(hsv, limite_inferior, limite_superior)
 
-                # 4.3 Calcular el centroide con cv2.moments()
+                # 5.3 Calcular el centroide con cv2.moments()
                 momentos = cv2.moments(mascara)
                 print(f"m00 = {momentos['m00']:.0f}")
 
@@ -155,7 +163,7 @@ def main():
                     cx = int(momentos["m10"] / momentos["m00"])
                     cy = int(momentos["m01"] / momentos["m00"])
 
-                    # 4-4 Dibujar centroide y anotación sobre el frame
+                    # 5.4 Dibujar centroide y anotación sobre el frame
                     cv2.circle(
                         img=frame,
                         center=(cx, cy),
@@ -184,7 +192,7 @@ def main():
 
         finally:
             # ===============================================================
-            # PASO 5: Cerrar ventanas al salir
+            # PASO 6: Cerrar ventanas al salir
             # ===============================================================
             cv2.destroyAllWindows()
 
