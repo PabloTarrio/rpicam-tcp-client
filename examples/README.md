@@ -10,7 +10,30 @@ Los ejemplos están organizados por "niveles de dificultad" para facilitar un ap
 
 1. Servidor corriendo: `sudo systemctl status camara-tcp.service`
 2. Instalación: `pip install -e .`
-3. Probar conexión básica: `python examples/01_basico/mostrar_video.py --host <Raspberry_Pi_IP>`
+3. Copiar la plantilla de configuración:
+```bash
+cp config.example.json config.json
+nano config.json # Edita con la IP de la RPi y preferencias.
+```
+4. Probar conexión básica: `python examples/01_basico/mostrar_video.py --host <Raspberry_Pi_IP>`
+
+> Con `config.json` configurado, ningún ejemplo necesita de `--host` ni parámetros adicionales.
+> Sin él, todos los parámetros pueden pasarse por la línea de comandos con `argparse`
+
+**`config_loader.py`** - Configuración global
+
+Función helper compartida por todos los ejemplos. Lee `config.json` desde
+la raíz del proyecto y devuelve un diccionario con los parámetros configurados.
+
+```json
+{
+  "conexion": { "host": "172.16.127.78", "port": 5001 },
+  "camara":   { "width": 640, "height": 480, "rotation": 180 }
+}
+```
+
+Si `config.json` no existe, `load_config()` devuelve `{}` sin error,
+y cada script usa sus valores `argparse` por defecto.
 
 ---
 
@@ -205,7 +228,7 @@ Video guardado: video.mp4
 
 **Controles:** `q` en ventana para parar antes del límite
 
-### 5. `detectar_movimiento.py` - Grabar video MP4 con timestamps
+### 5. `detectar_movimiento.py` - Detección de movimiento en tiempo real
 
 **Objetivo:** Detectar movimiento en tiempo real usando Background Subtraction
 
@@ -298,8 +321,7 @@ Capturando 100 frames...
 Formato: frame_001.jpg, frame_002.jpg,...
 Capturando: 100%|████████████| 100/100 [00:32<00:00]
 
-Secuencia completada: /ruta/framesara salir.
-Área mínima: 500px2 | Umbral: 25
+Secuencia completada: /ruta/frames
 ```
 > NOTA: Sin ventana gráfica. La barra de `tqdm` muestra el progreso en terminal
 

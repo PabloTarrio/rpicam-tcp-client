@@ -5,6 +5,20 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/),
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.6.0] - 2026-03-27
+
+### Added
+- `examples/config_loader.py`: función helper `load_config()` reutilizable
+  por todos los scripts de ejemplo
+- `config.example.json`: plantilla de configuración global con todos los
+  parámetros comunes (conexion, camara, grabacion, frames, deteccion_movimiento,
+  detector_color, calibracion, distancia_visual)
+- `config.json` añadido a `.gitignore`
+
+### Changed
+- Los 9 scripts de ejemplo adaptados para leer parámetros desde `config.json`
+  mediante `load_config()`, manteniendo compatibilidad total con `argparse`
+
 ## [0.5.0] - 2026-03-26
 
 ### Added

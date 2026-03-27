@@ -87,17 +87,17 @@
   - [x] Enlace a `server/README.md` y `examples/README.md`
 - [x] Actualizar `CHANGELOG.md` con versión `0.1.0`
 
-## Pendiente
-
 ### Fase 7 - Archivo de configuración global (v0.6.0)
-- [ ] Diseñar `config.example.json` con todos los parámetros comunes
-- [ ] Añadir `config.json` al `.gitignore`
-- [ ] Crear función helper `load_config()` reutilizable por todos los scripts
-- [ ] Adaptar 9 scripts de ejemplo para usar load_config()
-- [ ] Actualizar `examples\README.md` con instrucciones de configuración
-- [ ] Actualizar `README.md` principal con sección de primeros pasos
-- [ ] Documentar en `README.md` problema conocido de fuente Qt con opencv-python
+- [x] Diseñar `config.example.json` con todos los parámetros comunes
+- [x] Añadir `config.json` al `.gitignore`
+- [x] Crear función helper `load_config()` reutilizable por todos los scripts
+- [x] Adaptar 9 scripts de ejemplo para usar load_config()
+- [x] Actualizar `examples\README.md` con instrucciones de configuración
+- [x] Actualizar `README.md` principal con sección de primeros pasos
+- [x] Documentar en `README.md` problema conocido de fuente Qt con opencv-python
       y su solución (`cp dejavi fonts -> .venv/cv2/qt/fonts/`)
+
+## Pendiente
 
 ### Fase 8 - Publicacion en PyPI (v1.0.0)
 - [ ] Revisar y completar metadatos en `pyproject.toml`
@@ -116,6 +116,6 @@
 ## Notas
 - Puerto TCP del servidor de cámara: **5001** (el LIDAR usa el 5000)
 - Hardware: Raspberry Pi 4 con Camera Module 2 NoIR
-- Fecha última actualización: 2026-03-26
+- Fecha última actualización: 2026-03-27
 - Responsable: Pablo M. Tarrío
 - Repositorio: https://github.com/PabloTarrio/rpicam-tcp-client
