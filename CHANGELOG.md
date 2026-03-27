@@ -5,6 +5,18 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/),
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [Unreleased]
+
+## [1.0.0] - 2026-03-27
+
+### Added
+- Publicación oficial en PyPI como paquete instalable via `pip install rpicam-tcp-client`
+- Badge de PyPI en README.md
+
+### Changed
+- Metadatos de `pyproject.toml` actualizados: versión, classifiers, URLs del proyecto
+- Development Status cambiado a `Production/Stable`
+
 ## [0.6.0] - 2026-03-27
 
 ### Added
@@ -84,7 +96,3 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 - Workflow de GitHub Actions con lint (`ruff`) y tests (`pytest`)
 - `ROADMAP.md` con fases del proyecto
 - Test de humo inicial
-
-## [Unreleased]
-
-- Soporte para más resoluciones

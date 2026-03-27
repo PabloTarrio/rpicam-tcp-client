@@ -1,5 +1,6 @@
 # rpicam-tcp-client
 
+[![PyPI version](https://badge.fury.io/py/rpicam-tcp-client.svg)](https://pypi.org/project/rpicam-tcp-client/)
 [![CI](https://github.com/PabloTarrio/rpicam-tcp-client/actions/workflows/ci.yml/badge.svg)](https://github.com/PabloTarrio/rpicam-tcp-client/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -38,6 +39,12 @@ mediante TCP.
 
 ## Instalación
 
+### Desde PyPI (recomendado)
+```bash
+pip install rpicam-tcp-client
+```
+
+### Desde el código fuente (desarrollo)
 **Cliente (PC)**
 ```bash
 git clone https://github.com/PabloTarrio/rpicam-tcp-client.git
@@ -54,7 +61,7 @@ sudo systemctl enable --now camara-tcp.service
 
 ## Primeros pasos
 
-Los ejemplos pueden ejecutarse directamente con `--host`, pero tambien admiten un archivo de configuración global para evitar repetir parámetro en cada comando.
+Los ejemplos pueden ejecutarse directamente con `--host`, pero también admiten un archivo de configuración global para evitar repetir parámetro en cada comando.
 
 ```bash
 # Copiar plantilla de configuración
@@ -80,7 +87,7 @@ from rpicam_tcp_client import CameraClient
 import cv2
 
 with CameraClient (
-    host= TU_RASPBERRI_PI_IP,
+    host="TU_RASPBERRY_PI_IP",
     jpeg_quality= 60,
     saturation= 0.8,
     rotation= 180,
@@ -172,14 +179,14 @@ rpicam-tcp-client/
 |___ tests/
 |    |___test_smoke.py
 |    |___test_camera_client.py
-|___pyproyect.toml
+|___pyproject.toml
 ```
 
-## Desarollo
+## Desarrollo
 
 ```bash
-# Instalar dependecias de desarollo
-pip install -e "[.dev]"
+# Instalar dependencias de desarrollo
+pip install -e ".[dev]"
 
 # Ejecutar tests con cobertura
 pytest
@@ -193,7 +200,7 @@ ruff format .
 
 * [server/README.md](server/README.md) - Instalación del servidor en la Raspberry Pi
 * [examples/README.md](examples/README.md) - Guía de ejemplos
-* [CHANGELOG.md](changelog.md) - Historial de cambios
+* [CHANGELOG.md](CHANGELOG.md) - Historial de cambios
 
 ## Licencia
 
